@@ -1,13 +1,14 @@
 'use client'
 
-import { useMemo } from 'react'
-import { useGroupStore } from '../store/useGroupStore';
+import React from 'react';
 import HeroCard from '../components/dashboard/HeroCard';
 import TransactionFeed from '../components/ledger/TransactionFeed';
 import AddTransactionForm from '../components/admin/AddTransactionForm';
+import { useGroupStore } from '../store/useGroupStore';
+import { useMemo } from 'react'
 
 export default function Home() {
-  const { groupState, members, transactions, addTransaction } = useGroupStore();
+  const { groupState, transactions, members, addTransaction } = useGroupStore();
 
   /**
    * Para ni mag calculate pila nalang ka days
@@ -22,21 +23,16 @@ export default function Home() {
     }, [groupState.targetPayoutDate]);
 
   return (
-    <main className="min-h-screen bg-gray-50 pb-24">
-      <header className="bg-white px-4 py-3 shadow-sm sticky top-0 z-10 flex justify-between items-center">
-        <h1 className="font-bold text-lg text-gray-800">Kaberks Tampuhay</h1>
-        <div className="h-8 w-8 rounded-full bg-green-100 flex items-center justify-center text-green-700 font-bold text-xs">
-          {members[0]?.name.split(' ').map(n => n[0]).join('').substring(0, 2) || 'TB'}
-        </div>
-      </header>
-
-      <div className="p-4 space-y-6">
-        <HeroCard
-          totalPot={groupState.totalPot}
-          daysUntilPayout={daysUntilPayout} />
+    <>
+      <div className="flex flex-col items-center justify-center py-2">
+        <h1 className="text-2xl font-bold text-teal-700">Welcome to Tampuhay</h1>
       </div>
 
-      <div className="p-4 space-y-6">
+      <HeroCard
+        totalPot={groupState.totalPot}
+        daysUntilPayout={daysUntilPayout} />
+
+      <div className="space-y-6 pt-4">
         <div className="flex items-center justify-between mb-3">
           <h3 className="text-lg font-bold text-gray-800">Recent Activity</h3>
           <button className="text-sm text-green-600 font-medium">View All</button>
@@ -47,12 +43,12 @@ export default function Home() {
           members={members} />
       </div>
 
-      <div className="p-4 space-y-6">
-        <h1 className="text-2xl font-bold text-gray-800 mb-6">Treasurer Tools</h1>
+      <div className="pt-4 space-y-6">
+        <h3 className="text-lg font-bold text-gray-800 mb-6">Treasurer Tools</h3>
         <AddTransactionForm
           members={members}
           addTransaction={addTransaction} />
       </div>
-    </main>
+    </>
   );
 }
