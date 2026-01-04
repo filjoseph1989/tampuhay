@@ -3,6 +3,8 @@
 import { useMemo, useState } from 'react'
 import { useGroupStore } from '../store/useGroupStore';
 import { TransactionType } from '../types';
+import HeroCard from '../components/dashboard/HeroCard';
+import { formatMoney } from '../lib/currency';
 
 export default function Home() {
   const { groupState, members, transactions, addTransaction } = useGroupStore();
@@ -12,19 +14,6 @@ export default function Home() {
     type: 'CONTRIBUTION' as TransactionType,
     date: new Date().toISOString().split('T')[0], // Default to YYYY-MM-DD
   });
-
-  /**
-   * Gina gamit ni para pag display og correct sa currency
-   * sa app
-   * @param amount
-   * @returns
-   */
-  const formatMoney = (amount: number) => {
-    return new Intl.NumberFormat('en-PH', {
-      style: 'currency',
-      currency: 'PHP',
-    }).format(amount);
-  }
 
   /**
    * Helper ni para i-return ang name sa member given
@@ -84,17 +73,9 @@ export default function Home() {
       </header>
 
       <div className="p-4 space-y-6">
-        <div className="bg-green-600 rounded-2xl p-6 text-white shadow-lg shadow-green-200">
-          <p className="text-green-100 text-sm font-medium mb-1">Total Group Saving</p>
-          <h2 className="text-4xl font-bold  mb-4 tracking-tight">
-            {formatMoney(groupState.totalPot)}
-          </h2>
-
-          <div className="flex items-center justify-between bg-green-700/40 rounded-lg p-3 backdrop-blur-sm">
-            <span className="text-sm text-green-50 font-medium">Days until payout</span>
-            <span className="font-bold text-white">{daysUntilPayout} Days</span>
-          </div>
-        </div>
+        <HeroCard
+          totalPot={groupState.totalPot}
+          daysUntilPayout={daysUntilPayout} />
       </div>
 
       <div className="p-4 space-y-6">
