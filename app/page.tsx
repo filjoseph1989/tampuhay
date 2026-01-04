@@ -4,7 +4,7 @@ import { useMemo, useState } from 'react'
 import { useGroupStore } from '../store/useGroupStore';
 import { TransactionType } from '../types';
 import HeroCard from '../components/dashboard/HeroCard';
-import { formatMoney } from '../lib/currency';
+import TransactionFeed from '../components/ledger/TransactionFeed';
 
 export default function Home() {
   const { groupState, members, transactions, addTransaction } = useGroupStore();
@@ -14,18 +14,6 @@ export default function Home() {
     type: 'CONTRIBUTION' as TransactionType,
     date: new Date().toISOString().split('T')[0], // Default to YYYY-MM-DD
   });
-
-  /**
-   * Helper ni para i-return ang name sa member given
-   * ang ID
-   *
-   * @param id
-   * @returns
-   */
-  const getMemberName = (id: string) => {
-    const member = members.find(m => m.id === id)
-    return member ? member.name : "unknown member"
-  }
 
   /**
    * Para ni mag calculate pila nalang ka days
@@ -84,44 +72,9 @@ export default function Home() {
           <button className="text-sm text-green-600 font-medium">View All</button>
         </div>
 
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-          {transactions.length === 0 ? (
-            <div className="p-6 text-center text-gray-400 text-sm">
-              No transactions yet.
-            </div>
-          ) : (
-              <ul className="divide-y divide-gray-50">
-                {transactions.map((tx) => {
-                  const isPositive = ['CONTRIBUTION', 'FINE', 'LOAN_PAYMENT'].includes(tx.type);
-
-                  return (
-                    <li key={tx.id} className="p-4 flex items-center justify-between hover:bg-gray-50 transition-colors">
-                      <div className="flex items-center gap-3">
-                        <div className={`w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-sm shadow-sm
-                          ${tx.type === 'CONTRIBUTION' ? 'bg-blue-500' :
-                            tx.type === 'FINE' ? 'bg-orange-500' :
-                            tx.type === 'EXPENSE' ? 'bg-red-500' : 'bg-purple-500'}`}>
-                            {getMemberName(tx.memberId).charAt(0)}
-                        </div>
-
-                        <div>
-                          <p className="font-semibold text-gray-900 text-sm">{getMemberName(tx.memberId)}</p>
-                          <div className="text-xs text-gray-500 capitalize">
-                            <p> {tx.type.replace('_', ' ').toLowerCase()} </p>
-                            <p suppressHydrationWarning> {new Date(tx.date).toLocaleString()} </p>
-                          </div>
-                        </div>
-                      </div>
-
-                      <span className={`font-bold text-sm ${isPositive ? 'text-green-600' : 'text-red-600'}`}>
-                        {isPositive ? '+' : '-'}{formatMoney(tx.amount)}
-                      </span>
-                    </li>
-                  )
-                })}
-              </ul>
-          )}
-        </div>
+        <TransactionFeed
+          transactions={transactions}
+          members={members} />
       </div>
 
       <div className="p-4 space-y-6">
