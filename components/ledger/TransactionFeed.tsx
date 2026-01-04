@@ -1,5 +1,6 @@
 import React from 'react';
 import { Transaction, Member } from '../../types';
+import { getMemberName } from '../../lib/utils';
 import TransactionItem from './transactionItem';
 
 interface TransactionFeedProps {
@@ -8,11 +9,6 @@ interface TransactionFeedProps {
 }
 
 export default function TransactionFeed({ transactions, members }: TransactionFeedProps) {
-  const getMemberName = (id: string) => {
-    const member = members.find(m => m.id === id)
-    return member ? member.name : "unknown member"
-  }
-
   return (
     <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
       {transactions.length === 0 ? (
@@ -26,7 +22,7 @@ export default function TransactionFeed({ transactions, members }: TransactionFe
               <TransactionItem
                 key={tx.id}
                 transaction={tx}
-                memberName={getMemberName(tx.memberId)} />
+                memberName={getMemberName(members, tx.memberId)} />
             )
           })}
         </ul>
