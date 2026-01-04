@@ -1,11 +1,24 @@
 'use client'
 
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import { useGroupStore } from '../store/useGroupStore';
+import { TransactionType } from '../types';
 
 export default function Home() {
-  const { groupState, members, transactions } = useGroupStore();
+  const { groupState, members, transactions, addTransaction } = useGroupStore();
+  const [formData, setFormData] = useState({
+    memberId: '',
+    amount: '',
+    type: 'CONTRIBUTION' as TransactionType,
+    date: new Date().toISOString().split('T')[0], // Default to YYYY-MM-DD
+  });
 
+  /**
+   * Gina gamit ni para pag display og correct sa currency
+   * sa app
+   * @param amount
+   * @returns
+   */
   const formatMoney = (amount: number) => {
     return new Intl.NumberFormat('en-PH', {
       style: 'currency',
@@ -13,11 +26,22 @@ export default function Home() {
     }).format(amount);
   }
 
+  /**
+   * Helper ni para i-return ang name sa member given
+   * ang ID
+   *
+   * @param id
+   * @returns
+   */
   const getMemberName = (id: string) => {
     const member = members.find(m => m.id === id)
     return member ? member.name : "unknown member"
   }
 
+  /**
+   * Para ni mag calculate pila nalang ka days
+   * ang nabilin para mag payout
+   */
   const daysUntilPayout = useMemo(() => {
       const target = new Date(groupState.targetPayoutDate);
       const today = new Date();
@@ -25,6 +49,30 @@ export default function Home() {
       const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
       return diffDays > 0 ? diffDays : 0;
     }, [groupState.targetPayoutDate]);
+
+  /**
+   * Para ni mag record sa transaction
+   * @param e
+   * @returns
+   */
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (!formData.memberId || !formData.amount) return;
+    addTransaction({
+      memberId: formData.memberId,
+      amount: parseFloat(formData.amount),
+      type: formData.type,
+      date: new Date(formData.date).toISOString(),
+    });
+    alert("Transaction successfully recorded!");
+    setFormData({
+      ...formData,
+      amount: '',
+      memberId: '',
+      type: 'CONTRIBUTION',
+      date: new Date().toISOString().split('T')[0]
+    });
+  }
 
   return (
     <main className="min-h-screen bg-gray-50 pb-24">
@@ -100,11 +148,13 @@ export default function Home() {
         <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
           <h1 className="text-lg font-semibold mb-4 text-gray-700">Add Transaction</h1>
 
-          <form action="" className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-gray-600 mb-1">Member</label>
               <select
                 className="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-green-500 outline-none"
+                value={formData.memberId}
+                onChange={(e) => setFormData({...formData, memberId: e.target.value})}
                 required>
                 <option value="">Select a member...</option>
                 {members.map((m) => {
@@ -116,6 +166,8 @@ export default function Home() {
               <label className="block text-sm font-medium text-gray-600 mb-1">Type</label>
               <select
                 className="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-green-500 outline-none"
+                value={formData.type}
+                onChange={(e) => setFormData({...formData, type: e.target.value as TransactionType})}
                 required>
                 <option value="CONTRIBUTION">Contribution (Hulog)</option>
                 <option value="FINE">Fine (Penalty)</option>
@@ -129,6 +181,8 @@ export default function Home() {
               <input
                 type="number"
                 className="w-full p-3 text-lg font-bold text-gray-800 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-green-500 outline-none"
+                value={formData.amount}
+                onChange={(e) => setFormData({...formData, amount: e.target.value})}
                 placeholder="0.00"
                 required
                 min="1"
@@ -139,6 +193,8 @@ export default function Home() {
               <input
                 type="date"
                 className="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-green-500 outline-none"
+                value={formData.date}
+                onChange={(e) => setFormData({...formData, date: e.target.value})}
                 required
               />
             </div>
