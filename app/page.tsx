@@ -49,7 +49,7 @@ export default function Home() {
         </div>
       </div>
 
-      <div className="px-4">
+      <div className="p-4 space-y-6">
         <div className="flex items-center justify-between mb-3">
           <h3 className="text-lg font-bold text-gray-800">Recent Activity</h3>
           <button className="text-sm text-green-600 font-medium">View All</button>
@@ -92,6 +92,62 @@ export default function Home() {
                 })}
               </ul>
           )}
+        </div>
+      </div>
+
+      <div className="p-4 space-y-6">
+        <h1 className="text-2xl font-bold text-gray-800 mb-6">Treasurer Tools</h1>
+        <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
+          <h1 className="text-lg font-semibold mb-4 text-gray-700">Add Transaction</h1>
+
+          <form action="" className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-600 mb-1">Member</label>
+              <select
+                className="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-green-500 outline-none"
+                required>
+                <option value="">Select a member...</option>
+                {members.map((m) => {
+                  return (<option key={m.id} value={m.id}>{m.name}</option>)
+                })}
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-600 mb-1">Type</label>
+              <select
+                className="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-green-500 outline-none"
+                required>
+                <option value="CONTRIBUTION">Contribution (Hulog)</option>
+                <option value="FINE">Fine (Penalty)</option>
+                <option value="LOAN_PAYMENT">Loan Payment</option>
+                <option value="LOAN_DISBURSEMENT">Loan Disbursement (Out)</option>
+                <option value="EXPENSE">Expense (Out)</option>
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-600 mb-1">Amount (₱)</label>
+              <input
+                type="number"
+                className="w-full p-3 text-lg font-bold text-gray-800 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-green-500 outline-none"
+                placeholder="0.00"
+                required
+                min="1"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-600 mb-1">Date</label>
+              <input
+                type="date"
+                className="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-green-500 outline-none"
+                required
+              />
+            </div>
+            <button
+              type="submit"
+              className="w-full bg-green-600 text-white font-bold py-4 rounded-xl shadow-lg shadow-green-200 hover:bg-green-700 transition-colors mt-4">
+              Confirm Transaction
+            </button>
+          </form>
         </div>
       </div>
     </main>
