@@ -14,7 +14,7 @@ export function Input({
   children,
   ...props
 }: InputProps) {
-  const Component = as as any;
+  const Component = as as React.ElementType;
   
   return (
     <div className="w-full space-y-1.5">
