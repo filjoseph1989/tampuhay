@@ -16,6 +16,7 @@ const MOCK_MEMBERS: Member[] = [
   { id: '1', name: 'Tita Baby (Treasurer)', role: 'TREASURER', totalSaved: 5000 },
   { id: '2', name: 'Junjun', role: 'MEMBER', totalSaved: 1200 },
   { id: '3', name: 'Marites', role: 'MEMBER', totalSaved: 3000 },
+  { id: '4', name: 'Tiyo', role: 'KABERK', totalSaved: 3500 },
 ];
 
 const MOCK_TRANSACTIONS: Transaction[] = [

@@ -6,6 +6,7 @@ import { formatMoney } from '../../lib/currency';
 
 export default function LoanCalculator() {
   const [amount, setAmount] = useState<number>(1000);
+  const [borrower, setBorrower] = useState<string>('');
   const INTEREST_RATE = 5; // 5% Interest
 
   const loanQuote = calculateLoan(amount, INTEREST_RATE);
@@ -20,6 +21,12 @@ export default function LoanCalculator() {
 
         <div className="space-y-4">
           <Input
+            label="Who is borrowing?"
+            type="text"
+            value={borrower}
+            onChange={(e) => setBorrower(e.target.value)}
+          />
+          <Input
             label="How much do you want to borrow?"
             type="number"
             value={amount}
@@ -31,8 +38,8 @@ export default function LoanCalculator() {
           <div className="bg-blue-50 p-4 rounded-lg space-y-3">
             <div className="flex justify-between text-sm">
               <span className="text-gray-600">Interest ({INTEREST_RATE}%)</span>
-              <span className="font-medium text-red-600">
-                - {formatMoney(loanQuote.interest)}
+              <span className="font-medium text-green-600">
+                + {formatMoney(loanQuote.interest)}
               </span>
             </div>
             <div className="flex justify-between text-sm">

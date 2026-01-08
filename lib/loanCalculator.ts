@@ -7,7 +7,7 @@ export interface LoanQuote {
 
 /**
  * Calculates loan details based on the "Cali-out" (Upfront Deduction) model.
- * This is the standard for most informal Filipino lending (Tampuhay/Paluwagan).
+ * This is the standard for most informal Filipino lending (Tampuhay).
  *
  * Logic:
  * 1. Interest is calculated on the Principal.
@@ -23,7 +23,7 @@ export const calculateLoan = (amount: number, rate: number): LoanQuote => {
   return {
     principal: amount,
     interest: interest,
-    netProceeds: amount - interest, // Borrower gets less than they asked for
-    totalRepayment: amount          // But pays back the full round number
+    netProceeds: amount, // Borrower gets less than they asked for
+    totalRepayment: amount + interest, // But pays back the full round number
   };
 };

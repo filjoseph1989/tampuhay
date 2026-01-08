@@ -4,7 +4,7 @@ export type LoanStatus = 'PENDING' | 'ACTIVE' | 'PAID' | 'DEFAULTED';
 export interface Member {
     id: string;
     name: string;
-    role: 'TREASURER' | 'MEMBER';
+    role: 'TREASURER' | 'MEMBER' | 'KABERK';
     totalSaved: number;
 }
 
