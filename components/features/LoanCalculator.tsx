@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import { useState } from 'react';
 import { Card } from '../ui/Card';
 import { Input } from '../ui/Input';
 import { calculateLoan } from '../../lib/loanCalculator';
@@ -6,11 +6,9 @@ import { formatMoney } from '../../lib/currency';
 
 export default function LoanCalculator() {
   const [amount, setAmount] = useState<number>(1000);
-  const interestRate = 5; // Default 5% as per docs
+  const INTEREST_RATE = 5; // 5% Interest
 
-  const quote = useMemo(() => {
-    return calculateLoan(amount, interestRate);
-  }, [amount, interestRate]);
+  const loanQuote = calculateLoan(amount, INTEREST_RATE);
 
   return (
     <Card className="max-w-md mx-auto">
@@ -29,45 +27,31 @@ export default function LoanCalculator() {
             min={0}
             step={100}
           />
-          
-          <input
-            type="range"
-            min="500"
-            max="10000"
-            step="500"
-            value={amount}
-            onChange={(e) => setAmount(Number(e.target.value))}
-            className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-teal-600"
-          />
-          <div className="flex justify-between text-xs text-gray-400 px-1">
-            <span>₱500</span>
-            <span>₱10,000</span>
-          </div>
-        </div>
 
-        <div className="bg-teal-50 rounded-2xl p-6 space-y-4 border border-teal-100">
-          <div className="flex justify-between items-center">
-            <span className="text-gray-600">You borrow:</span>
-            <span className="font-bold text-gray-800">{formatMoney(quote.principal)}</span>
-          </div>
-          
-          <div className="flex justify-between items-center text-red-600">
-            <span className="text-sm italic">Interest ({interestRate}%):</span>
-            <span className="font-medium">-{formatMoney(quote.interest)}</span>
-          </div>
-
-          <div className="pt-4 border-t border-teal-200/50 flex justify-between items-end">
-            <div>
-              <p className="text-xs text-teal-600 font-semibold uppercase tracking-wider">You receive</p>
-              <p className="text-2xl font-black text-teal-700">{formatMoney(quote.netProceeds)}</p>
+          <div className="bg-blue-50 p-4 rounded-lg space-y-3">
+            <div className="flex justify-between text-sm">
+              <span className="text-gray-600">Interest ({INTEREST_RATE}%)</span>
+              <span className="font-medium text-red-600">
+                - {formatMoney(loanQuote.interest)}
+              </span>
+            </div>
+            <div className="flex justify-between text-sm">
+              <span className="text-gray-600">Cash You Receive</span>
+              <span className="font-bold text-green-700 text-lg">
+                {formatMoney(loanQuote.netProceeds)}
+              </span>
+            </div>
+            <div className="pt-2 border-t border-blue-200 flex justify-between text-sm">
+              <span className="text-gray-600">Total to Repay</span>
+              <span className="font-bold text-gray-900">
+                {formatMoney(loanQuote.totalRepayment)}
+              </span>
             </div>
           </div>
 
-          <div className="pt-2 text-center">
-            <p className="text-sm text-gray-500">
-              You pay back <span className="font-bold text-gray-700">{formatMoney(quote.totalRepayment)}</span> in 30 days
-            </p>
-          </div>
+          <p className="text-xs text-gray-400 text-center">
+            * Interest is deducted upfront (Cali-out).
+          </p>
         </div>
       </div>
     </Card>

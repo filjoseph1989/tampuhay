@@ -15,7 +15,7 @@ export function Input({
   ...props
 }: InputProps) {
   const Component = as as React.ElementType;
-  
+
   return (
     <div className="w-full space-y-1.5">
       {label && (
@@ -27,8 +27,7 @@ export function Input({
         className={`w-full p-3.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-teal-500 focus:border-transparent outline-none transition-all duration-200 text-gray-800 placeholder:text-gray-400 ${
           error ? 'border-red-500 bg-red-50' : ''
         } ${className}`}
-        {...props}
-      >
+        {...props}>
         {children}
       </Component>
       {error && (

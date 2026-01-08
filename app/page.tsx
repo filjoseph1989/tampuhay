@@ -1,6 +1,5 @@
 'use client'
 
-import React from 'react';
 import HeroCard from '../components/dashboard/HeroCard';
 import TransactionFeed from '../components/ledger/TransactionFeed';
 import AddTransactionForm from '../components/admin/AddTransactionForm';
