@@ -16,14 +16,24 @@ export interface LoanQuote {
  *
  * @param amount - The principal amount to borrow
  * @param rate - The monthly interest rate in percentage (e.g., 5 for 5%)
+ * @param borrower - The name of the borrower
  */
-export const calculateLoan = (amount: number, rate: number): LoanQuote => {
+export const calculateLoan = (amount: number, rate: number, role: string = 'MEMBER'): LoanQuote => {
   const interest = amount * (rate / 100);
+
+  if (role === 'KABERK' || role === 'TREASURER') {
+    return {
+      principal: amount,
+      interest: interest,
+      netProceeds: amount, // Borrower gets less than they asked for
+      totalRepayment: amount + interest, // But pays back the full round number
+    };
+  }
 
   return {
     principal: amount,
     interest: interest,
-    netProceeds: amount, // Borrower gets less than they asked for
-    totalRepayment: amount + interest, // But pays back the full round number
+    netProceeds: amount - interest, // Borrower gets less than they asked for
+    totalRepayment: amount, // But pays back the full round number
   };
 };

@@ -3,13 +3,17 @@ import { Card } from '../ui/Card';
 import { Input } from '../ui/Input';
 import { calculateLoan } from '../../lib/loanCalculator';
 import { formatMoney } from '../../lib/currency';
+import { useGroupStore } from '../../store/useGroupStore';
 
 export default function LoanCalculator() {
   const [amount, setAmount] = useState<number>(1000);
   const [borrower, setBorrower] = useState<string>('');
+  const members = useGroupStore((state) => state.members);
   const INTEREST_RATE = 5; // 5% Interest
 
-  const loanQuote = calculateLoan(amount, INTEREST_RATE);
+  const member = members.find((m) => m.name === borrower);
+  const role = member ? member.role : 'MEMBER';
+  const loanQuote = calculateLoan(amount, INTEREST_RATE, role);
 
   return (
     <Card className="max-w-md mx-auto">
@@ -25,7 +29,15 @@ export default function LoanCalculator() {
             type="text"
             value={borrower}
             onChange={(e) => setBorrower(e.target.value)}
+            list="member-list"
+            placeholder="Type to search..."
           />
+          <datalist id="member-list">
+            {members.map((m) => (
+              <option key={m.id} value={m.name} />
+            ))}
+          </datalist>
+
           <Input
             label="How much do you want to borrow?"
             type="number"
@@ -38,7 +50,9 @@ export default function LoanCalculator() {
           <div className="bg-blue-50 p-4 rounded-lg space-y-3">
             <div className="flex justify-between text-sm">
               <span className="text-gray-600">Interest ({INTEREST_RATE}%)</span>
-              <span className="font-medium text-green-600">
+              <span className={`font-medium ${
+                role === 'KABERK' || role === 'TREASURER' ? 'text-green-600' : 'text-red-600'
+              }`}>
                 + {formatMoney(loanQuote.interest)}
               </span>
             </div>
