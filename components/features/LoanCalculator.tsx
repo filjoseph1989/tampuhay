@@ -6,14 +6,16 @@ import { formatMoney } from '../../lib/currency';
 import { useGroupStore } from '../../store/useGroupStore';
 
 export default function LoanCalculator() {
-  const [amount, setAmount] = useState<number>(1000);
+  const [amount, setAmount] = useState<number>(0);
   const [borrower, setBorrower] = useState<string>('');
   const members = useGroupStore((state) => state.members);
+  const totalPot = useGroupStore((state) => state.groupState.totalPot);
   const INTEREST_RATE = 5; // 5% Interest
 
   const member = members.find((m) => m.name === borrower);
   const role = member ? member.role : 'MEMBER';
   const loanQuote = calculateLoan(amount, INTEREST_RATE, role);
+  const exceedsPot = amount > totalPot;
 
   return (
     <Card className="max-w-md mx-auto">
@@ -38,14 +40,22 @@ export default function LoanCalculator() {
             ))}
           </datalist>
 
-          <Input
-            label="How much do you want to borrow?"
-            type="number"
-            value={amount}
-            onChange={(e) => setAmount(Number(e.target.value))}
-            min={0}
-            step={100}
-          />
+          <div className="space-y-1">
+            <Input
+              label="How much do you want to borrow?"
+              type="number"
+              value={amount}
+              onChange={(e) => setAmount(Number(e.target.value))}
+              min={0}
+              step={100}
+              error={exceedsPot ? `Amount exceeds total pot (${formatMoney(totalPot)})` : undefined}
+            />
+            {exceedsPot && (
+              <p className="text-xs font-medium text-red-500 animate-pulse">
+                ⚠️ Insufficient funds in the group pot.
+              </p>
+            )}
+          </div>
 
           <div className="bg-blue-50 p-4 rounded-lg space-y-3">
             <div className="flex justify-between text-sm">
