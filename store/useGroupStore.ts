@@ -13,22 +13,24 @@ interface GroupStore {
 
 // --- MOCK DATA FOR PHASE 1 ---
 const MOCK_MEMBERS: Member[] = [
-  { id: '1', name: 'Tita Baby (Treasurer)', role: 'TREASURER', totalSaved: 5000 },
-  { id: '2', name: 'Junjun', role: 'MEMBER', totalSaved: 1200 },
-  { id: '3', name: 'Marites', role: 'MEMBER', totalSaved: 3000 },
-  { id: '4', name: 'Tiyo', role: 'KABERK', totalSaved: 3500 },
+  { id: '1', name: 'fil (Treasurer)', role: 'TREASURER', totalSaved: 0 },
+  { id: '2', name: 'romel', role: 'KABERK', totalSaved: 0 },
+  { id: '3', name: 'bonald', role: 'MEMBER', totalSaved: 0 },
+  { id: '4', name: 'bernard', role: 'KABERK', totalSaved: 0 },
+  { id: '5', name: 'charlotte', role: 'KABERK', totalSaved: 0 },
+  { id: '6', name: 'leslie', role: 'KABERK', totalSaved: 0 },
+  { id: '7', name: 'rejean', role: 'KABERK', totalSaved: 0 },
+  { id: '8', name: 'rodelyn', role: 'KABERK', totalSaved: 0 },
+  { id: '9', name: 'connie', role: 'KABERK', totalSaved: 0 },
+  { id: '10', name: 'ailene', role: 'KABERK', totalSaved: 0 },
 ];
 
-const MOCK_TRANSACTIONS: Transaction[] = [
-  { id: 't1', memberId: '1', type: 'CONTRIBUTION', amount: 5000, date: new Date().toISOString() },
-  { id: 't2', memberId: '2', type: 'CONTRIBUTION', amount: 1200, date: new Date().toISOString() },
-  { id: 't3', memberId: '3', type: 'CONTRIBUTION', amount: 3000, date: new Date().toISOString() },
-];
+const MOCK_TRANSACTIONS: Transaction[] = [];
 
 export const useGroupStore = create<GroupStore>((set, get) => ({
   // Initial State
   groupState: {
-    totalPot: 9200, // Sum of mock contributions
+    totalPot: 0, // Sum of mock contributions
     cycleStart: new Date().toISOString(),
     targetPayoutDate: new Date(new Date().setMonth(new Date().getMonth() + 11)).toISOString(), // ~1 year from now
   },
