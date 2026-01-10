@@ -33,7 +33,6 @@ export default function AddTransactionForm({ members, addTransaction }: AddTrans
       date: new Date(formData.date).toISOString(),
     });
 
-    alert("Transaction successfully recorded!");
     setFormData({
       ...formData,
       amount: '',
@@ -91,7 +90,7 @@ export default function AddTransactionForm({ members, addTransaction }: AddTrans
           required
         />
 
-        <Button type="submit" fullWidth className="mt-4">
+        <Button type="submit" fullWidth className="mt-4 cursor-pointer">
           Confirm Transaction
         </Button>
       </form>

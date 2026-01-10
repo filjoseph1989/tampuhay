@@ -1,14 +1,16 @@
 import { create } from 'zustand';
-import { GroupState, Member, Transaction } from '../types';
+import { GroupState, Member, Transaction, Loan } from '../types';
 
 interface GroupStore {
   groupState: GroupState;
   members: Member[];
   transactions: Transaction[];
+  activeLoans: Loan[];
 
   // Actions
   addTransaction: (transaction: Omit<Transaction, 'id'>) => void;
   getMemberTransactions: (memberId: string) => Transaction[];
+  requestLoan: (loan: Omit<Loan, 'id'|'status'|'amountPaid'>) => void;
 }
 
 // --- MOCK DATA FOR PHASE 1 ---
@@ -36,6 +38,7 @@ export const useGroupStore = create<GroupStore>((set, get) => ({
   },
   members: MOCK_MEMBERS,
   transactions: MOCK_TRANSACTIONS,
+  activeLoans: [],
 
   // Actions
   addTransaction: (newTx) => {
@@ -90,4 +93,17 @@ export const useGroupStore = create<GroupStore>((set, get) => ({
   getMemberTransactions: (memberId) => {
     return get().transactions.filter((t) => t.memberId === memberId);
   },
+
+  requestLoan: (newLoan) => {
+    const loan: Loan = {
+      ...newLoan,
+      id: Math.random().toString(36).substring(7),
+      status: 'PENDING',
+      amountPaid: 0,
+    };
+
+    set((state) => ({
+      activeLoans: [loan, ...state.activeLoans],
+    }));
+  }
 }));

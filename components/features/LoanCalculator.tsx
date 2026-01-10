@@ -4,10 +4,14 @@ import { Input } from '../ui/Input';
 import { calculateLoan } from '../../lib/loanCalculator';
 import { formatMoney } from '../../lib/currency';
 import { useGroupStore } from '../../store/useGroupStore';
+import { Button } from '../ui/Button';
+import LoanApplicationForm from './LoanApplicationForm'
 
 export default function LoanCalculator() {
   const [amount, setAmount] = useState<number>(0);
   const [borrower, setBorrower] = useState<string>('');
+  const [showForm, setShowForm] = useState<boolean>(false);
+  const [success, setSuccess] = useState<boolean>(false);
   const members = useGroupStore((state) => state.members);
   const totalPot = useGroupStore((state) => state.groupState.totalPot);
   const INTEREST_RATE = 5; // 5% Interest
@@ -16,6 +20,39 @@ export default function LoanCalculator() {
   const role = member ? member.role : 'MEMBER';
   const loanQuote = calculateLoan(amount, INTEREST_RATE, role);
   const exceedsPot = amount > totalPot;
+
+  if (success) {
+    return (
+      <Card className="max-w-md mx-auto text-center py-10 space-y-4">
+        <div className="bg-green-100 text-green-600 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+          <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
+          </svg>
+        </div>
+        <h2 className="text-2xl font-bold text-gray-800">Application Sent!</h2>
+        <p className="text-gray-500">Your loan request has been submitted for approval.</p>
+        <Button onClick={() => { setSuccess(false); setAmount(0); setBorrower(''); }} variant="secondary">
+          Close
+        </Button>
+      </Card>
+    )
+  }
+
+  if (showForm) {
+    return (
+      <LoanApplicationForm
+        borrowerName={borrower}
+        amount={amount}
+        onCancel={() => setShowForm(false)}
+        onSuccess= {() => {
+          setShowForm(false);
+          setSuccess(true);
+        }}
+        loanQuote={loanQuote}
+        interest_rate={INTEREST_RATE}
+      />
+    )
+  }
 
   return (
     <Card className="max-w-md mx-auto">
@@ -83,6 +120,13 @@ export default function LoanCalculator() {
           <p className="text-xs text-gray-400 text-center">
             * Interest is deducted upfront (Cali-out).
           </p>
+
+          <Button fullWidth
+            className="cursor-pointer"
+            disabled={!member || amount <= 0 || exceedsPot}
+            onClick={() => setShowForm(true)}>
+            Apply Now
+          </Button>
         </div>
       </div>
     </Card>
