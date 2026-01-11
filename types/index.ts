@@ -25,6 +25,7 @@ export interface GroupState {
 export interface Loan {
     id: string;
     memberId: string;
+    type: 'STANDARD' | 'AUTO_CONTRIBUTION';
     principal: number;
     interestRate: number;
     startDate: string;
