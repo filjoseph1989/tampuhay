@@ -1,11 +1,14 @@
 import { create } from 'zustand';
 import { GroupState, Member, Transaction, Loan } from '../types';
+import { calculateLoan } from '@/lib/loanCalculator';
 
 interface GroupStore {
   groupState: GroupState;
   members: Member[];
   transactions: Transaction[];
   activeLoans: Loan[];
+  approveLoan: (loanId: string) => void;
+  rejectLoan: (loanId: string) => void;
 
   // Actions
   addTransaction: (transaction: Omit<Transaction, 'id'>) => void;
@@ -17,7 +20,7 @@ interface GroupStore {
 const MOCK_MEMBERS: Member[] = [
   { id: '1', name: 'fil (Treasurer)', role: 'TREASURER', totalSaved: 0 },
   { id: '2', name: 'romel', role: 'KABERK', totalSaved: 0 },
-  { id: '3', name: 'bonald', role: 'MEMBER', totalSaved: 0 },
+  { id: '3', name: 'ronald', role: 'MEMBER', totalSaved: 0 },
   { id: '4', name: 'bernard', role: 'KABERK', totalSaved: 0 },
   { id: '5', name: 'charlotte', role: 'KABERK', totalSaved: 0 },
   { id: '6', name: 'leslie', role: 'KABERK', totalSaved: 0 },
@@ -38,7 +41,51 @@ export const useGroupStore = create<GroupStore>((set, get) => ({
   },
   members: MOCK_MEMBERS,
   transactions: MOCK_TRANSACTIONS,
-  activeLoans: [],
+
+  activeLoans: [
+  ],
+  approveLoan: (loanId) => {
+    const state = get();
+    const loanIndex = state.activeLoans.findIndex((l) => l.id === loanId);
+    if (loanIndex === -1) return;
+
+    const loan = state.activeLoans[loanIndex];
+    const member = state.members.find((m) => m.id === loan.memberId);
+    if (!member) return;
+
+    const { netProceeds, interest } = calculateLoan(loan.principal, loan.interestRate, member.role);
+    const updatedLoans = [...state.activeLoans];
+    updatedLoans[loanIndex] = { ...loan, status: 'ACTIVE' };
+
+    set({ activeLoans: updatedLoans });
+
+    // disbursement
+    get().addTransaction({
+      memberId: loan.memberId,
+      type: 'LOAN_DISBURSEMENT',
+      amount: netProceeds,
+      date: new Date().toISOString(),
+    });
+
+    // Interest earned
+    get().addTransaction({
+      memberId: loan.memberId,
+      type: 'INTEREST_EARNED',
+      amount: interest,
+      date: new Date().toISOString(),
+    });
+  },
+
+  rejectLoan: (loanId) => {
+    set((state) => {
+      const updatedLoans = state.activeLoans.map((l) => {
+        return l.id === loanId
+          ? { ...l, status: 'REJECTED' as const }
+          : l
+        });
+      return ({ activeLoans: updatedLoans });
+    })
+  },
 
   // Actions
   addTransaction: (newTx) => {
