@@ -4,6 +4,7 @@ import HeroCard from '../components/dashboard/HeroCard';
 import TransactionFeed from '../components/ledger/TransactionFeed';
 import AddTransactionForm from '../components/admin/AddTransactionForm';
 import LoanCalculator from '../components/features/LoanCalculator';
+import LoanApprovalDashboard from '../components/admin/LoanApprovalDashboard';
 import { useGroupStore } from '../store/useGroupStore';
 import { useMemo } from 'react'
 
@@ -53,6 +54,11 @@ export default function Home() {
         <AddTransactionForm
           members={members}
           addTransaction={addTransaction} />
+      </div>
+
+      <div className="space-y-4 mt-8">
+        <h4 className="text-md font-semibold text-gray-700">Loan Requests</h4>
+        <LoanApprovalDashboard />
       </div>
     </>
   );
