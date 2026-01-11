@@ -14,6 +14,7 @@ interface GroupStore {
   addTransaction: (transaction: Omit<Transaction, 'id'>) => void;
   getMemberTransactions: (memberId: string) => Transaction[];
   requestLoan: (loan: Omit<Loan, 'id'|'status'|'amountPaid'>) => void;
+  convertToAutoLoan: (memberId: string, amount: number, interestRate: number) => void;
 }
 
 // --- MOCK DATA FOR PHASE 1 ---
@@ -41,9 +42,8 @@ export const useGroupStore = create<GroupStore>((set, get) => ({
   },
   members: MOCK_MEMBERS,
   transactions: MOCK_TRANSACTIONS,
+  activeLoans: [],
 
-  activeLoans: [
-  ],
   approveLoan: (loanId) => {
     const state = get();
     const loanIndex = state.activeLoans.findIndex((l) => l.id === loanId);
@@ -115,6 +115,10 @@ export const useGroupStore = create<GroupStore>((set, get) => ({
           // Money leaving the pot
           potChange = -transaction.amount;
           break;
+        case 'INTEREST_EARNED':
+          // Interest earned is a record, doesn't change pot here as it's often deducted upfront (netProceeds)
+          potChange = 0;
+          break;
       }
 
       // 3. Update the specific Member's savings
@@ -152,5 +156,48 @@ export const useGroupStore = create<GroupStore>((set, get) => ({
     set((state) => ({
       activeLoans: [loan, ...state.activeLoans],
     }));
+  },
+
+  convertToAutoLoan: (memberId, amount, interestRate) => {
+    const state = get();
+    const member = state.members.find(m => m.id === memberId);
+    if (!member) return;
+
+    const dueDate = new Date();
+    dueDate.setMonth(dueDate.getMonth() + 1);
+
+    const loan: Loan = {
+      id: Math.random().toString(36).substring(7),
+      memberId,
+      type: 'AUTO_CONTRIBUTION',
+      principal: amount,
+      interestRate,
+      startDate: new Date().toISOString(),
+      dueDate: dueDate.toISOString(),
+      status: 'ACTIVE',
+      amountPaid: 0,
+    };
+
+    // 1. Add the Loan
+    set((state) => ({
+      activeLoans: [loan, ...state.activeLoans],
+    }));
+
+    // 2. Dual Transaction Logic
+    // Transaction A: The Payment (Increases Member Savings and Pot)
+    get().addTransaction({
+      memberId,
+      type: 'CONTRIBUTION',
+      amount: amount,
+      date: new Date().toISOString(),
+    });
+
+    // Transaction B: The Funding (Decreases Pot, netting out the cash impact)
+    get().addTransaction({
+      memberId,
+      type: 'LOAN_DISBURSEMENT',
+      amount: amount,
+      date: new Date().toISOString(),
+    });
   }
 }));
