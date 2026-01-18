@@ -14,21 +14,21 @@ interface GroupStore {
   addTransaction: (transaction: Omit<Transaction, 'id'>) => void;
   getMemberTransactions: (memberId: string) => Transaction[];
   requestLoan: (loan: Omit<Loan, 'id'|'status'|'amountPaid'>) => void;
-  convertToAutoLoan: (memberId: string, amount: number, interestRate: number) => void;
+  convertToAutoLoan: (memberId: string, amount: number) => void;
 }
 
 // --- MOCK DATA FOR PHASE 1 ---
 const MOCK_MEMBERS: Member[] = [
-  { id: '1', name: 'fil (Treasurer)', role: 'TREASURER', totalSaved: 0 },
-  { id: '2', name: 'romel', role: 'KABERK', totalSaved: 0 },
-  { id: '3', name: 'ronald', role: 'MEMBER', totalSaved: 0 },
-  { id: '4', name: 'bernard', role: 'KABERK', totalSaved: 0 },
-  { id: '5', name: 'charlotte', role: 'KABERK', totalSaved: 0 },
-  { id: '6', name: 'leslie', role: 'KABERK', totalSaved: 0 },
-  { id: '7', name: 'rejean', role: 'KABERK', totalSaved: 0 },
-  { id: '8', name: 'rodelyn', role: 'KABERK', totalSaved: 0 },
-  { id: '9', name: 'connie', role: 'KABERK', totalSaved: 0 },
-  { id: '10', name: 'ailene', role: 'KABERK', totalSaved: 0 },
+  { id: '1', name: 'fil (Treasurer)', role: 'TREASURER', totalSaved: 0, numberOfShares: 5 },
+  { id: '2', name: 'romel', role: 'KABERK', totalSaved: 0, numberOfShares: 5 },
+  { id: '3', name: 'ronald', role: 'MEMBER', totalSaved: 0, numberOfShares: 1 },
+  { id: '4', name: 'bernard', role: 'KABERK', totalSaved: 0, numberOfShares: 5 },
+  { id: '5', name: 'charlotte', role: 'KABERK', totalSaved: 0, numberOfShares: 5 },
+  { id: '6', name: 'leslie', role: 'KABERK', totalSaved: 0, numberOfShares: 5 },
+  { id: '7', name: 'rejean', role: 'KABERK', totalSaved: 0, numberOfShares: 5 },
+  { id: '8', name: 'rodelyn', role: 'KABERK', totalSaved: 0, numberOfShares: 5 },
+  { id: '9', name: 'connie', role: 'KABERK', totalSaved: 0, numberOfShares: 5 },
+  { id: '10', name: 'ailene', role: 'KABERK', totalSaved: 0, numberOfShares: 5 },
 ];
 
 const MOCK_TRANSACTIONS: Transaction[] = [];
@@ -158,10 +158,18 @@ export const useGroupStore = create<GroupStore>((set, get) => ({
     }));
   },
 
-  convertToAutoLoan: (memberId, amount, interestRate) => {
+  convertToAutoLoan: (memberId, amount) => {
     const state = get();
     const member = state.members.find(m => m.id === memberId);
     if (!member) return;
+
+    const INTEREST_RATE = 5; // 5% flat interest per requirement
+    
+    // Auto-Loan Logic for Past Due:
+    // New Principal = Amount (Debt) + Interest on Debt
+    // Then the loan itself carries the standard interest rate.
+    const pastDueInterest = amount * (INTEREST_RATE / 100);
+    const newPrincipal = amount + pastDueInterest;
 
     const dueDate = new Date();
     dueDate.setMonth(dueDate.getMonth() + 1);
@@ -170,8 +178,8 @@ export const useGroupStore = create<GroupStore>((set, get) => ({
       id: Math.random().toString(36).substring(7),
       memberId,
       type: 'AUTO_CONTRIBUTION',
-      principal: amount,
-      interestRate,
+      principal: newPrincipal, // Updated Principal
+      interestRate: INTEREST_RATE,
       startDate: new Date().toISOString(),
       dueDate: dueDate.toISOString(),
       status: 'ACTIVE',
@@ -193,6 +201,8 @@ export const useGroupStore = create<GroupStore>((set, get) => ({
     });
 
     // Transaction B: The Funding (Decreases Pot, netting out the cash impact)
+    // We disburse the *original* amount to cover the contribution.
+    // The difference (pastDueInterest) is effectively the penalty added to the principal.
     get().addTransaction({
       memberId,
       type: 'LOAN_DISBURSEMENT',

@@ -6,6 +6,7 @@ export interface Member {
     name: string;
     role: 'TREASURER' | 'MEMBER' | 'KABERK';
     totalSaved: number;
+    numberOfShares: number;
 }
 
 export interface Transaction {
