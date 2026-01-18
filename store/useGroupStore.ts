@@ -16,20 +16,22 @@ interface GroupStore {
   requestLoan: (loan: Omit<Loan, 'id'|'status'|'amountPaid'>) => void;
   convertToAutoLoan: (memberId: string, amount: number) => void;
   rolloverLoan: (loanId: string) => void;
+  setShareValue: (value: number) => void;
+  updateMemberShares: (memberId: string, shares: number) => void;
 }
 
 // --- MOCK DATA FOR PHASE 1 ---
 const MOCK_MEMBERS: Member[] = [
-  { id: '1', name: 'fil (Treasurer)', role: 'TREASURER', totalSaved: 0, numberOfShares: 5 },
-  { id: '2', name: 'romel', role: 'KABERK', totalSaved: 0, numberOfShares: 5 },
-  { id: '3', name: 'ronald', role: 'MEMBER', totalSaved: 0, numberOfShares: 1 },
-  { id: '4', name: 'bernard', role: 'KABERK', totalSaved: 0, numberOfShares: 5 },
-  { id: '5', name: 'charlotte', role: 'KABERK', totalSaved: 0, numberOfShares: 5 },
-  { id: '6', name: 'leslie', role: 'KABERK', totalSaved: 0, numberOfShares: 5 },
-  { id: '7', name: 'rejean', role: 'KABERK', totalSaved: 0, numberOfShares: 5 },
-  { id: '8', name: 'rodelyn', role: 'KABERK', totalSaved: 0, numberOfShares: 5 },
-  { id: '9', name: 'connie', role: 'KABERK', totalSaved: 0, numberOfShares: 5 },
-  { id: '10', name: 'ailene', role: 'KABERK', totalSaved: 0, numberOfShares: 5 },
+  { id: '1', name: 'fil (Treasurer)', role: 'TREASURER', totalSaved: 0, numberOfShares: 0 },
+  { id: '2', name: 'romel', role: 'KABERK', totalSaved: 0, numberOfShares: 0 },
+  { id: '3', name: 'ronald', role: 'MEMBER', totalSaved: 0, numberOfShares: 0 },
+  { id: '4', name: 'bernard', role: 'KABERK', totalSaved: 0, numberOfShares: 0 },
+  { id: '5', name: 'charlotte', role: 'KABERK', totalSaved: 0, numberOfShares: 0 },
+  { id: '6', name: 'leslie', role: 'KABERK', totalSaved: 0, numberOfShares: 0 },
+  { id: '7', name: 'rejean', role: 'KABERK', totalSaved: 0, numberOfShares: 0 },
+  { id: '8', name: 'rodelyn', role: 'KABERK', totalSaved: 0, numberOfShares: 0 },
+  { id: '9', name: 'connie', role: 'KABERK', totalSaved: 0, numberOfShares: 0 },
+  { id: '10', name: 'ailene', role: 'KABERK', totalSaved: 0, numberOfShares: 0 },
 ];
 
 const MOCK_TRANSACTIONS: Transaction[] = [];
@@ -40,6 +42,7 @@ export const useGroupStore = create<GroupStore>((set, get) => ({
     totalPot: 0, // Sum of mock contributions
     cycleStart: new Date().toISOString(),
     targetPayoutDate: new Date(new Date().setMonth(new Date().getMonth() + 11)).toISOString(), // ~1 year from now
+    shareValue: 1000,
   },
   members: MOCK_MEMBERS,
   transactions: MOCK_TRANSACTIONS,
@@ -208,7 +211,7 @@ export const useGroupStore = create<GroupStore>((set, get) => ({
     const state = get();
     const loanIndex = state.activeLoans.findIndex((l) => l.id === loanId);
     if (loanIndex === -1) return;
-    
+
     const oldLoan = state.activeLoans[loanIndex];
     const INTEREST_RATE = 5; // Standard 5%
 
@@ -235,7 +238,7 @@ export const useGroupStore = create<GroupStore>((set, get) => ({
     // Update State
     set((state) => {
       // 1. Mark old loan as PAID (Refinanced)
-      const updatedLoans = state.activeLoans.map(l => 
+      const updatedLoans = state.activeLoans.map(l =>
         l.id === loanId ? { ...l, status: 'PAID' as const } : l
       );
 
@@ -244,5 +247,22 @@ export const useGroupStore = create<GroupStore>((set, get) => ({
         activeLoans: [newLoan, ...updatedLoans],
       };
     });
+  },
+
+  setShareValue: (value) => {
+    set((state) => ({
+      groupState: {
+        ...state.groupState,
+        shareValue: value,
+      },
+    }));
+  },
+
+  updateMemberShares: (memberId, shares) => {
+    set((state) => ({
+      members: state.members.map((m) =>
+        m.id === memberId ? { ...m, numberOfShares: shares } : m
+      ),
+    }));
   }
 }));

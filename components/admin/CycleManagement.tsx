@@ -2,6 +2,7 @@ import { useGroupStore } from '../../store/useGroupStore';
 import { Card } from '../ui/Card';
 import { Button } from '../ui/Button';
 import { formatMoney } from '../../lib/currency';
+import CycleSettings from './CycleSettings';
 
 export default function CycleManagement() {
   const members = useGroupStore((state) => state.members);
@@ -9,7 +10,7 @@ export default function CycleManagement() {
   const activeLoans = useGroupStore((state) => state.activeLoans);
   const convertToAutoLoan = useGroupStore((state) => state.convertToAutoLoan);
   const rolloverLoan = useGroupStore((state) => state.rolloverLoan);
-  const SHARE_VALUE = 1000;
+  const SHARE_VALUE = useGroupStore((state) => state.groupState.shareValue);
 
   // --- LOGIC 1: UNPAID SHARE CAPITAL ---
   const getMissingContribution = (memberId: string, numberOfShares: number) => {
@@ -50,75 +51,81 @@ export default function CycleManagement() {
 
   if (delinquentMembers.length === 0 && pastDueLoans.length === 0) {
     return (
-      <Card className="p-6 text-center text-gray-500">
-        <p>All clear! No unpaid shares or past-due loans. 🎉</p>
-      </Card>
+      <div className="space-y-4">
+        <CycleSettings />
+        <Card className="p-6 text-center text-gray-500">
+          <p>All clear! No unpaid shares or past-due loans. 🎉</p>
+        </Card>
+      </div>
     );
   }
 
   return (
-    <Card className="p-4 space-y-6">
-      <div className="flex justify-between items-center border-b pb-2">
-        <h3 className="font-bold text-gray-800">Cycle Management</h3>
-        <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">
-          {new Date().getFullYear()} Cycle
-        </span>
-      </div>
-      {/* SECTION 1: UNPAID SHARE CAPITAL */}
-      {delinquentMembers.length > 0 && (
-        <div className="space-y-3">
-          <h4 className="text-xs font-bold text-gray-500 uppercase tracking-wider">Unpaid Share Capital</h4>
-          <p className="text-sm text-gray-600">Convert unpaid dues to Auto-Loans (5% Interest).</p>
-          <div className="space-y-3">
-            {delinquentMembers.map((member) => (
-              <div key={member.id} className="flex items-center justify-between bg-gray-50 p-3 rounded border border-gray-100">
-                <div>
-                  <p className="font-bold text-gray-800">{member.name}</p>
-                  <div className="text-xs text-gray-500">
-                    Shares: {member.numberOfShares} (Target: {formatMoney(member.numberOfShares * SHARE_VALUE)})
-                  </div>
-                  <p className="text-xs text-red-500 font-semibold">Missing: {formatMoney(member.missingAmount)}</p>
-                </div>
-                <Button
-                  variant="danger"
-                  className="py-1 px-3 text-xs"
-                  onClick={() => handleConvert(member.id, member.missingAmount)}>
-                  Auto-Loan
-                </Button>
-              </div>
-            ))}
-          </div>
+    <div className="space-y-4">
+      <CycleSettings />
+      <Card className="p-4 space-y-6">
+        <div className="flex justify-between items-center border-b pb-2">
+          <h3 className="font-bold text-gray-800">Cycle Management</h3>
+          <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">
+            {new Date().getFullYear()} Cycle
+          </span>
         </div>
-      )}
-      {/* SECTION 2: PAST DUE LOANS */}
-      {pastDueLoans.length > 0 && (
-        <div className="space-y-3">
-          <div className="border-t pt-4">
-            <h4 className="text-xs font-bold text-red-500 uppercase tracking-wider">⚠️ Past Due Loans</h4>
-          </div>
-          <p className="text-sm text-gray-600">Loans that have exceeded their due date. Rollover to add penalty.</p>
+        {/* SECTION 1: UNPAID SHARE CAPITAL */}
+        {delinquentMembers.length > 0 && (
           <div className="space-y-3">
-            {pastDueLoans.map((loan) => {
-              const member = members.find(m => m.id === loan.memberId);
-              return (
-                <div key={loan.id} className="flex items-center justify-between bg-red-50 p-3 rounded border border-red-100">
+            <h4 className="text-xs font-bold text-gray-500 uppercase tracking-wider">Unpaid Share Capital</h4>
+            <p className="text-sm text-gray-600">Convert unpaid dues to Auto-Loans (5% Interest).</p>
+            <div className="space-y-3">
+              {delinquentMembers.map((member) => (
+                <div key={member.id} className="flex items-center justify-between bg-gray-50 p-3 rounded border border-gray-100">
                   <div>
-                    <p className="font-bold text-gray-800">{member?.name || 'Unknown Member'}</p>
-                    <div className="text-xs text-gray-500">Due: {new Date(loan.dueDate).toLocaleDateString()}</div>
-                    <p className="text-xs text-red-600 font-semibold">Principal: {formatMoney(loan.principal)}</p>
+                    <p className="font-bold text-gray-800">{member.name}</p>
+                    <div className="text-xs text-gray-500">
+                      Shares: {member.numberOfShares} (Target: {formatMoney(member.numberOfShares * SHARE_VALUE)})
+                    </div>
+                    <p className="text-xs text-red-500 font-semibold">Missing: {formatMoney(member.missingAmount)}</p>
                   </div>
                   <Button
                     variant="danger"
                     className="py-1 px-3 text-xs"
-                    onClick={() => handleRollover(loan.id, loan.principal, member?.name || '')}>
-                    Rollover
+                    onClick={() => handleConvert(member.id, member.missingAmount)}>
+                    Auto-Loan
                   </Button>
                 </div>
-              );
-            })}
+              ))}
+            </div>
           </div>
-        </div>
-      )}
-    </Card>
+        )}
+        {/* SECTION 2: PAST DUE LOANS */}
+        {pastDueLoans.length > 0 && (
+          <div className="space-y-3">
+            <div className="border-t pt-4">
+              <h4 className="text-xs font-bold text-red-500 uppercase tracking-wider">⚠️ Past Due Loans</h4>
+            </div>
+            <p className="text-sm text-gray-600">Loans that have exceeded their due date. Rollover to add penalty.</p>
+            <div className="space-y-3">
+              {pastDueLoans.map((loan) => {
+                const member = members.find(m => m.id === loan.memberId);
+                return (
+                  <div key={loan.id} className="flex items-center justify-between bg-red-50 p-3 rounded border border-red-100">
+                    <div>
+                      <p className="font-bold text-gray-800">{member?.name || 'Unknown Member'}</p>
+                      <div className="text-xs text-gray-500">Due: {new Date(loan.dueDate).toLocaleDateString()}</div>
+                      <p className="text-xs text-red-600 font-semibold">Principal: {formatMoney(loan.principal)}</p>
+                    </div>
+                    <Button
+                      variant="danger"
+                      className="py-1 px-3 text-xs"
+                      onClick={() => handleRollover(loan.id, loan.principal, member?.name || '')}>
+                      Rollover
+                    </Button>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
+      </Card>
+    </div>
   );
 }

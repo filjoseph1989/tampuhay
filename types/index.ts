@@ -21,6 +21,7 @@ export interface GroupState {
     totalPot: number;
     cycleStart: string;
     targetPayoutDate: string;
+    shareValue: number;
 }
 
 export interface Loan {
