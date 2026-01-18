@@ -1,13 +1,12 @@
 'use client'
 
 import HeroCard from '../components/dashboard/HeroCard';
-import TransactionFeed from '../components/ledger/TransactionFeed';
 import LoanCalculator from '../components/features/LoanCalculator';
 import { useGroupStore } from '../store/useGroupStore';
 import { useMemo } from 'react'
 
 export default function Home() {
-  const { groupState, transactions, members } = useGroupStore();
+  const { groupState } = useGroupStore();
 
   /**
    * Para ni mag calculate pila nalang ka days
@@ -33,17 +32,6 @@ export default function Home() {
 
       <div className="pt-8 space-y-6">
         <LoanCalculator />
-      </div>
-
-      <div className="space-y-6 pt-8">
-        <div className="flex items-center justify-between mb-3">
-          <h3 className="text-lg font-bold text-gray-800">Recent Activity</h3>
-          <button className="text-sm text-green-600 font-medium">View All</button>
-        </div>
-
-        <TransactionFeed
-          transactions={transactions}
-          members={members} />
       </div>
     </>
   );

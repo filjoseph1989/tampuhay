@@ -4,9 +4,10 @@ import { useGroupStore } from '../../store/useGroupStore';
 import CycleManagement from '../../components/admin/CycleManagement';
 import LoanApprovalDashboard from '../../components/admin/LoanApprovalDashboard';
 import AddTransactionForm from '../../components/admin/AddTransactionForm';
+import TransactionFeed from '../../components/ledger/TransactionFeed';
 
 export default function AdminPage() {
-  const { members, addTransaction } = useGroupStore();
+  const { members, addTransaction, transactions } = useGroupStore();
 
   return (
     <div className="pt-2 space-y-8 pb-8">
@@ -30,6 +31,16 @@ export default function AdminPage() {
         <AddTransactionForm
           members={members}
           addTransaction={addTransaction} />
+      </div>
+
+      <div className="space-y-4">
+        <div className="flex items-center justify-between">
+          <h4 className="text-sm font-semibold text-gray-500 uppercase tracking-wider">Recent Activity</h4>
+          <button className="text-sm text-green-600 font-medium">View All</button>
+        </div>
+        <TransactionFeed
+          transactions={transactions}
+          members={members} />
       </div>
     </div>
   );
