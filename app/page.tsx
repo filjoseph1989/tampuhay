@@ -5,6 +5,7 @@ import TransactionFeed from '../components/ledger/TransactionFeed';
 import AddTransactionForm from '../components/admin/AddTransactionForm';
 import LoanCalculator from '../components/features/LoanCalculator';
 import LoanApprovalDashboard from '../components/admin/LoanApprovalDashboard';
+import CycleManagement from '../components/admin/CycleManagement';
 import { useGroupStore } from '../store/useGroupStore';
 import { useMemo } from 'react'
 
@@ -49,16 +50,25 @@ export default function Home() {
           members={members} />
       </div>
 
-      <div className="pt-8 space-y-6">
-        <h3 className="text-lg font-bold text-gray-800 mb-6">Treasurer Tools</h3>
-        <AddTransactionForm
-          members={members}
-          addTransaction={addTransaction} />
-      </div>
+      <div className="pt-8 space-y-8">
+        <h3 className="text-lg font-bold text-gray-800 mb-2">Treasurer Tools</h3>
+        
+        <div className="space-y-4">
+          <h4 className="text-sm font-semibold text-gray-500 uppercase tracking-wider">Cycle Management</h4>
+          <CycleManagement />
+        </div>
 
-      <div className="space-y-4 mt-8">
-        <h4 className="text-md font-semibold text-gray-700">Loan Requests</h4>
-        <LoanApprovalDashboard />
+        <div className="space-y-4">
+          <h4 className="text-sm font-semibold text-gray-500 uppercase tracking-wider">Loan Requests</h4>
+          <LoanApprovalDashboard />
+        </div>
+
+        <div className="space-y-4">
+          <h4 className="text-sm font-semibold text-gray-500 uppercase tracking-wider">Record Transaction</h4>
+          <AddTransactionForm
+            members={members}
+            addTransaction={addTransaction} />
+        </div>
       </div>
     </>
   );

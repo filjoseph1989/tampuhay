@@ -41,6 +41,7 @@ export default function LoanApplicationForm({
     await new Promise(resolve => setTimeout(resolve, 1000)); // This is for API
     requestLoan({
       memberId: member.id,
+      type: 'STANDARD',
       principal: amount,
       interestRate: interest_rate,
       startDate: new Date().toISOString(),
