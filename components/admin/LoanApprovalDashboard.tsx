@@ -7,6 +7,9 @@ import { Button } from "@/components/ui/Button";
 export default function LoanApprovalDashboard() {
   const activeLoans = useGroupStore((state) => state.activeLoans);
   const members = useGroupStore((state) => state.members);
+  const approveLoan = useGroupStore((state) => state.approveLoan);
+  const rejectLoan = useGroupStore((state) => state.rejectLoan);
+  
   const pendingLoans = activeLoans.filter((l) => l.status === 'PENDING');
   console.log('pending loans', pendingLoans);
 
@@ -39,6 +42,18 @@ export default function LoanApprovalDashboard() {
     return 'HIGH';
   }
 
+  const handleApprove = (loanId: string, memberName: string) => {
+    if (confirm(`Approve loan for ${memberName}?`)) {
+      approveLoan(loanId);
+    }
+  };
+
+  const handleReject = (loanId: string, memberName: string) => {
+    if (confirm(`Reject loan for ${memberName}?`)) {
+      rejectLoan(loanId);
+    }
+  };
+
   if (pendingLoans.length === 0) {
     return (
       <Card className="p-6 text-center text-gray-500">
@@ -51,12 +66,13 @@ export default function LoanApprovalDashboard() {
     <div>
       {pendingLoans.map((loan) => {
         const risk = getRiskLevel(loan.memberId, loan.principal);
+        const memberName = getMemberName(loan.memberId);
 
         return (
           <Card key={loan.id} className="p-4 flex flex-col gap-4">
             <div className="flex justify-between items-start">
               <div>
-                <h3>{getMemberName(loan.memberId)}</h3>
+                <h3>{memberName}</h3>
                 <p>Requested: {formatMoney(loan.principal)}</p>
               </div>
               <Badge variant={getRiskColor(risk)}>
@@ -66,11 +82,14 @@ export default function LoanApprovalDashboard() {
             <div className="flex gap-2 mt-2">
               <Button
                 variant="danger"
-                fullWidth className="bg-green-600 hover:bg-green-700 cursor-pointer">
+                fullWidth 
+                className="cursor-pointer"
+                onClick={() => handleReject(loan.id, memberName)}>
                 Reject
               </Button>
               <Button fullWidth
-                className="bg-green-600 hover:bg-green-700 cursor-pointer">
+                className="bg-green-600 hover:bg-green-700 cursor-pointer"
+                onClick={() => handleApprove(loan.id, memberName)}>
                 Approve
               </Button>
             </div>
