@@ -15,6 +15,7 @@ interface GroupStore {
   getMemberTransactions: (memberId: string) => Transaction[];
   requestLoan: (loan: Omit<Loan, 'id'|'status'|'amountPaid'>) => void;
   convertToAutoLoan: (memberId: string, amount: number) => void;
+  rolloverLoan: (loanId: string) => void;
 }
 
 // --- MOCK DATA FOR PHASE 1 ---
@@ -164,12 +165,6 @@ export const useGroupStore = create<GroupStore>((set, get) => ({
     if (!member) return;
 
     const INTEREST_RATE = 5; // 5% flat interest per requirement
-    
-    // Auto-Loan Logic for Past Due:
-    // New Principal = Amount (Debt) + Interest on Debt
-    // Then the loan itself carries the standard interest rate.
-    const pastDueInterest = amount * (INTEREST_RATE / 100);
-    const newPrincipal = amount + pastDueInterest;
 
     const dueDate = new Date();
     dueDate.setMonth(dueDate.getMonth() + 1);
@@ -178,7 +173,7 @@ export const useGroupStore = create<GroupStore>((set, get) => ({
       id: Math.random().toString(36).substring(7),
       memberId,
       type: 'AUTO_CONTRIBUTION',
-      principal: newPrincipal, // Updated Principal
+      principal: amount, // Use original amount for the first loan
       interestRate: INTEREST_RATE,
       startDate: new Date().toISOString(),
       dueDate: dueDate.toISOString(),
@@ -201,13 +196,53 @@ export const useGroupStore = create<GroupStore>((set, get) => ({
     });
 
     // Transaction B: The Funding (Decreases Pot, netting out the cash impact)
-    // We disburse the *original* amount to cover the contribution.
-    // The difference (pastDueInterest) is effectively the penalty added to the principal.
     get().addTransaction({
       memberId,
       type: 'LOAN_DISBURSEMENT',
       amount: amount,
       date: new Date().toISOString(),
+    });
+  },
+
+  rolloverLoan: (loanId) => {
+    const state = get();
+    const loanIndex = state.activeLoans.findIndex((l) => l.id === loanId);
+    if (loanIndex === -1) return;
+    
+    const oldLoan = state.activeLoans[loanIndex];
+    const INTEREST_RATE = 5; // Standard 5%
+
+    // Rollover Logic:
+    // New Principal = Old Principal + Penalty Interest (5% of Old Principal)
+    const penalty = oldLoan.principal * (INTEREST_RATE / 100);
+    const newPrincipal = oldLoan.principal + penalty;
+
+    const newDueDate = new Date();
+    newDueDate.setMonth(newDueDate.getMonth() + 1);
+
+    const newLoan: Loan = {
+      id: Math.random().toString(36).substring(7),
+      memberId: oldLoan.memberId,
+      type: 'STANDARD', // Rollover becomes a standard loan obligation
+      principal: newPrincipal,
+      interestRate: INTEREST_RATE,
+      startDate: new Date().toISOString(),
+      dueDate: newDueDate.toISOString(),
+      status: 'ACTIVE',
+      amountPaid: 0,
+    };
+
+    // Update State
+    set((state) => {
+      // 1. Mark old loan as PAID (Refinanced)
+      const updatedLoans = state.activeLoans.map(l => 
+        l.id === loanId ? { ...l, status: 'PAID' as const } : l
+      );
+
+      // 2. Add the new Loan
+      return {
+        activeLoans: [newLoan, ...updatedLoans],
+      };
     });
   }
 }));
