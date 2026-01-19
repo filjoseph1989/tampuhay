@@ -2,6 +2,7 @@
 
 import { useGroupStore } from '../../store/useGroupStore';
 import CycleManagement from '../../components/admin/CycleManagement';
+import { CollapsibleSection } from '../../components/ui/CollapsibleSection';
 import LoanApprovalDashboard from '../../components/admin/LoanApprovalDashboard';
 import AddTransactionForm from '../../components/admin/AddTransactionForm';
 import TransactionFeed from '../../components/ledger/TransactionFeed';
@@ -11,40 +12,33 @@ export default function AdminPage() {
   const { members, addTransaction, transactions } = useGroupStore();
 
   return (
-    <div className="pt-2 space-y-8 pb-8">
-      <div className="flex flex-col items-center justify-center">
+    <div className="pt-2 space-y-6 pb-20">
+      <div className="flex flex-col items-center justify-center mb-6">
         <h1 className="text-2xl font-bold text-teal-700">Treasurer Tools</h1>
         <p className="text-sm text-gray-500">Manage cycle, loans, and transactions</p>
       </div>
 
       <AdminStats />
-      
-      <div className="space-y-4">
-        <h4 className="text-sm font-semibold text-gray-500 uppercase tracking-wider">Cycle Management</h4>
+
+      <CollapsibleSection title="Cycle Management" defaultExpanded={false}>
         <CycleManagement />
-      </div>
+      </CollapsibleSection>
 
-      <div className="space-y-4">
-        <h4 className="text-sm font-semibold text-gray-500 uppercase tracking-wider">Loan Requests</h4>
+      <CollapsibleSection title="Loan Requests" defaultExpanded={true}>
         <LoanApprovalDashboard />
-      </div>
+      </CollapsibleSection>
 
-      <div className="space-y-4">
-        <h4 className="text-sm font-semibold text-gray-500 uppercase tracking-wider">Record Transaction</h4>
+      <CollapsibleSection title="Record Transaction" defaultExpanded={true}>
         <AddTransactionForm
           members={members}
           addTransaction={addTransaction} />
-      </div>
+      </CollapsibleSection>
 
-      <div className="space-y-4">
-        <div className="flex items-center justify-between">
-          <h4 className="text-sm font-semibold text-gray-500 uppercase tracking-wider">Recent Activity</h4>
-          <button className="text-sm text-green-600 font-medium">View All</button>
-        </div>
+      <CollapsibleSection title="Recent Activity" defaultExpanded={false}>
         <TransactionFeed
           transactions={transactions}
           members={members} />
-      </div>
+      </CollapsibleSection>
     </div>
   );
 }
