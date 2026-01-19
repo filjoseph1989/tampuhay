@@ -33,6 +33,16 @@ export default function TransactionItem({ transaction, memberName }: Transaction
       sign = '-';
       iconBg = type === 'EXPENSE' ? 'bg-red-500' : 'bg-purple-500';
       break;
+    case 'INTEREST_EARNED':
+      amountColor = 'text-green-600';
+      sign = '+';
+      iconBg = 'bg-teal-500';
+      break;
+    case 'LOAN_ROLLOVER':
+      amountColor = 'text-gray-600';
+      sign = '↺ ';
+      iconBg = 'bg-indigo-500';
+      break;
   }
 
   return (

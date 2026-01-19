@@ -36,6 +36,31 @@ const MOCK_MEMBERS: Member[] = [
 
 const MOCK_TRANSACTIONS: Transaction[] = [];
 
+const MOCK_ACTIVE_LOANS: Loan[] = [
+  {
+    id: 'loan-past-due-1',
+    memberId: '2', // romel
+    type: 'STANDARD',
+    principal: 5000,
+    interestRate: 5,
+    startDate: new Date(new Date().setMonth(new Date().getMonth() - 2)).toISOString(), // 2 months ago
+    dueDate: new Date(new Date().setMonth(new Date().getMonth() - 1)).toISOString(),   // 1 month ago (Past Due)
+    status: 'ACTIVE',
+    amountPaid: 0,
+  },
+  {
+    id: 'loan-past-due-2',
+    memberId: '3', // ronald
+    type: 'AUTO_CONTRIBUTION',
+    principal: 1000,
+    interestRate: 5,
+    startDate: new Date(new Date().setMonth(new Date().getMonth() - 1)).toISOString(),
+    dueDate: new Date(new Date().setDate(new Date().getDate() - 5)).toISOString(),     // 5 days ago (Past Due)
+    status: 'ACTIVE',
+    amountPaid: 0,
+  }
+];
+
 export const useGroupStore = create<GroupStore>((set, get) => ({
   // Initial State
   groupState: {
@@ -46,7 +71,7 @@ export const useGroupStore = create<GroupStore>((set, get) => ({
   },
   members: MOCK_MEMBERS,
   transactions: MOCK_TRANSACTIONS,
-  activeLoans: [],
+  activeLoans: MOCK_ACTIVE_LOANS,
 
   approveLoan: (loanId) => {
     const state = get();
@@ -120,7 +145,9 @@ export const useGroupStore = create<GroupStore>((set, get) => ({
           potChange = -transaction.amount;
           break;
         case 'INTEREST_EARNED':
+        case 'LOAN_ROLLOVER':
           // Interest earned is a record, doesn't change pot here as it's often deducted upfront (netProceeds)
+          // Rollover is an accounting event, no cash flow
           potChange = 0;
           break;
       }
@@ -246,6 +273,22 @@ export const useGroupStore = create<GroupStore>((set, get) => ({
       return {
         activeLoans: [newLoan, ...updatedLoans],
       };
+    });
+
+    // 3. Record the Penalty Interest as a transaction (Recent Activity)
+    get().addTransaction({
+      memberId: oldLoan.memberId,
+      type: 'INTEREST_EARNED',
+      amount: penalty,
+      date: new Date().toISOString(),
+    });
+
+    // 4. Record the Rollover Event (New Loan Creation)
+    get().addTransaction({
+      memberId: oldLoan.memberId,
+      type: 'LOAN_ROLLOVER',
+      amount: newPrincipal,
+      date: new Date().toISOString(),
     });
   },
 

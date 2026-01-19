@@ -1,4 +1,4 @@
-export type TransactionType = 'CONTRIBUTION' | 'LOAN_PAYMENT' | 'LOAN_DISBURSEMENT' | 'FINE' | 'EXPENSE' | 'INTEREST_EARNED';
+export type TransactionType = 'CONTRIBUTION' | 'LOAN_PAYMENT' | 'LOAN_DISBURSEMENT' | 'FINE' | 'EXPENSE' | 'INTEREST_EARNED' | 'LOAN_ROLLOVER';
 export type LoanStatus = 'PENDING' | 'ACTIVE' | 'PAID' | 'DEFAULTED' | 'REJECTED';
 
 export interface Member {

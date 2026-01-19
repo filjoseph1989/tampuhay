@@ -99,7 +99,7 @@ export default function CycleManagement() {
         {/* SECTION 2: PAST DUE LOANS */}
         {pastDueLoans.length > 0 && (
           <div className="space-y-3">
-            <div className="border-t pt-4">
+            <div>
               <h4 className="text-xs font-bold text-red-500 uppercase tracking-wider">⚠️ Past Due Loans</h4>
             </div>
             <p className="text-sm text-gray-600">Loans that have exceeded their due date. Rollover to add penalty.</p>
