@@ -5,6 +5,7 @@ import CycleManagement from '../../components/admin/CycleManagement';
 import LoanApprovalDashboard from '../../components/admin/LoanApprovalDashboard';
 import AddTransactionForm from '../../components/admin/AddTransactionForm';
 import TransactionFeed from '../../components/ledger/TransactionFeed';
+import AdminStats from '../../components/admin/AdminStats';
 
 export default function AdminPage() {
   const { members, addTransaction, transactions } = useGroupStore();
@@ -15,6 +16,8 @@ export default function AdminPage() {
         <h1 className="text-2xl font-bold text-teal-700">Treasurer Tools</h1>
         <p className="text-sm text-gray-500">Manage cycle, loans, and transactions</p>
       </div>
+
+      <AdminStats />
       
       <div className="space-y-4">
         <h4 className="text-sm font-semibold text-gray-500 uppercase tracking-wider">Cycle Management</h4>
