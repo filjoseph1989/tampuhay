@@ -145,7 +145,9 @@ export const useGroupStore = create<GroupStore>((set, get) => ({
           potChange = -transaction.amount;
           break;
         case 'INTEREST_EARNED':
+        case 'LOAN_ROLLOVER':
           // Interest earned is a record, doesn't change pot here as it's often deducted upfront (netProceeds)
+          // Rollover is an accounting event, no cash flow
           potChange = 0;
           break;
       }
@@ -278,6 +280,14 @@ export const useGroupStore = create<GroupStore>((set, get) => ({
       memberId: oldLoan.memberId,
       type: 'INTEREST_EARNED',
       amount: penalty,
+      date: new Date().toISOString(),
+    });
+
+    // 4. Record the Rollover Event (New Loan Creation)
+    get().addTransaction({
+      memberId: oldLoan.memberId,
+      type: 'LOAN_ROLLOVER',
+      amount: newPrincipal,
       date: new Date().toISOString(),
     });
   },
