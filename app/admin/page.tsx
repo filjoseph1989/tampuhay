@@ -1,8 +1,8 @@
 'use client';
 
 import { useGroupStore } from '../../store/useGroupStore';
-import CycleManagement from '../../components/admin/CycleManagement';
 import { CollapsibleSection } from '../../components/ui/CollapsibleSection';
+import CycleManagement from '../../components/admin/CycleManagement';
 import LoanApprovalDashboard from '../../components/admin/LoanApprovalDashboard';
 import ActiveLoansManager from '../../components/admin/ActiveLoansManager';
 import AddTransactionForm from '../../components/admin/AddTransactionForm';
