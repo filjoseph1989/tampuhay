@@ -8,9 +8,9 @@ export default function AdminStats() {
 
   const stats = useMemo(() => {
     // 1. Outstanding Loans
-    const outstanding = activeLoans
-      .filter(l => l.status === 'ACTIVE')
-      .reduce((sum, l) => sum + l.principal, 0);
+    const activeLoansList = activeLoans.filter(l => l.status === 'ACTIVE');
+    const outstanding = activeLoansList.reduce((sum, l) => sum + l.principal, 0);
+    const activeCount = activeLoansList.length;
 
     // 2. Collection Progress
     const targetCollection = members.reduce((sum, m) => sum + (m.numberOfShares * groupState.shareValue), 0);
@@ -22,17 +22,22 @@ export default function AdminStats() {
       ? Math.round((actualCollection / targetCollection) * 100) 
       : 0;
 
+    // 3. Pending Requests
+    const pendingCount = activeLoans.filter(l => l.status === 'PENDING').length;
+
     return {
       totalPot: groupState.totalPot,
       outstanding,
+      activeCount,
       collectionRate,
       targetCollection,
-      actualCollection
+      actualCollection,
+      pendingCount
     };
   }, [groupState, activeLoans, transactions, members]);
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
       <Card className="p-4 bg-teal-50 border-teal-100">
         <p className="text-xs font-bold text-teal-600 uppercase tracking-wider">Total Pot</p>
         <p className="text-2xl font-black text-teal-900">{formatMoney(stats.totalPot)}</p>
@@ -42,7 +47,7 @@ export default function AdminStats() {
       </Card>
 
       <Card className="p-4 bg-indigo-50 border-indigo-100">
-        <p className="text-xs font-bold text-indigo-600 uppercase tracking-wider">Outstanding Loans</p>
+        <p className="text-xs font-bold text-indigo-600 uppercase tracking-wider">Active Loans ({stats.activeCount})</p>
         <p className="text-2xl font-black text-indigo-900">{formatMoney(stats.outstanding)}</p>
         <p className="text-[10px] text-indigo-400 mt-1 italic">Money currently in circulation</p>
       </Card>
@@ -66,6 +71,12 @@ export default function AdminStats() {
             style={{ width: `${Math.min(stats.collectionRate, 100)}%` }} 
           />
         </div>
+      </Card>
+
+      <Card className="p-4 bg-rose-50 border-rose-100">
+        <p className="text-xs font-bold text-rose-600 uppercase tracking-wider">Pending Requests</p>
+        <p className="text-2xl font-black text-rose-900">{stats.pendingCount}</p>
+        <p className="text-[10px] text-rose-400 mt-1 italic">Awaiting approval</p>
       </Card>
     </div>
   );

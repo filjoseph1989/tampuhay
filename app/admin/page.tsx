@@ -4,6 +4,7 @@ import { useGroupStore } from '../../store/useGroupStore';
 import CycleManagement from '../../components/admin/CycleManagement';
 import { CollapsibleSection } from '../../components/ui/CollapsibleSection';
 import LoanApprovalDashboard from '../../components/admin/LoanApprovalDashboard';
+import ActiveLoansManager from '../../components/admin/ActiveLoansManager';
 import AddTransactionForm from '../../components/admin/AddTransactionForm';
 import TransactionFeed from '../../components/ledger/TransactionFeed';
 import AdminStats from '../../components/admin/AdminStats';
@@ -28,7 +29,11 @@ export default function AdminPage() {
         <LoanApprovalDashboard />
       </CollapsibleSection>
 
-      <CollapsibleSection title="Record Transaction" defaultExpanded={true}>
+      <CollapsibleSection title="Active Loans" defaultExpanded={false}>
+        <ActiveLoansManager />
+      </CollapsibleSection>
+
+      <CollapsibleSection title="Record Transaction" defaultExpanded={false}>
         <AddTransactionForm
           members={members}
           addTransaction={addTransaction} />

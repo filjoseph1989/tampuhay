@@ -1,4 +1,5 @@
 import React from 'react';
+import Link from 'next/link';
 import { Transaction } from '../../types';
 import { formatMoney } from '../../lib/currency';
 
@@ -8,7 +9,7 @@ interface TransactionItemProps {
 }
 
 export default function TransactionItem({ transaction, memberName }: TransactionItemProps) {
-  const { type, amount, date } = transaction;
+  const { type, amount, date, memberId } = transaction;
 
   // Visual Logic based on Transaction Type
   let amountColor = 'text-gray-900';
@@ -47,18 +48,18 @@ export default function TransactionItem({ transaction, memberName }: Transaction
 
   return (
     <li className="p-4 flex items-center justify-between hover:bg-gray-50 transition-colors">
-      <div className="flex items-center gap-3">
+      <Link href={`/members/${memberId}`} className="flex items-center gap-3 flex-1">
         <div className={`w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-sm shadow-sm ${iconBg}`}>
           {memberName.charAt(0)}
         </div>
         <div>
-          <p className="font-semibold text-gray-900 text-sm">{memberName}</p>
+          <p className="font-semibold text-gray-900 text-sm hover:text-teal-600 transition-colors">{memberName}</p>
           <div className="text-xs text-gray-500 capitalize">
             <p>{type.replace('_', ' ').toLowerCase()}</p>
             <p suppressHydrationWarning>{new Date(date).toLocaleString()}</p>
           </div>
         </div>
-      </div>
+      </Link>
       <span className={`font-bold text-sm ${amountColor}`}>
         {sign}{formatMoney(amount)}
       </span>
