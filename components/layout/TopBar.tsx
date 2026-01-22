@@ -3,7 +3,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { User } from 'lucide-react';
-import { useGroupStore } from '../../store/useGroupStore';
+import { useSession } from 'next-auth/react';
 
 interface TopBarProps {
   userName?: string;
@@ -11,11 +11,10 @@ interface TopBarProps {
 }
 
 export function TopBar({ groupName = 'Tampuhay Group' }: TopBarProps) {
-  const { members } = useGroupStore();
+  const { data: session } = useSession();
 
-  const treasurer = members[0];
-  const displayName = treasurer?.name
-    .replace(/\(.*\)/, '')
+  const displayName = session?.user?.name
+    ?.replace(/\(.*\)/, '')
     .trim()
     .toUpperCase();
 
@@ -25,14 +24,20 @@ export function TopBar({ groupName = 'Tampuhay Group' }: TopBarProps) {
         {groupName}
       </Link>
 
-      <Link href={`/members/${treasurer?.id || '1'}`} className="flex items-center space-x-2 hover:bg-teal-700 p-1 rounded-lg transition-colors">
-        <span className="text-sm font-medium hidden sm:block">
-          {displayName || 'Guest'}
-        </span>
-        <div className="bg-teal-700 p-1.5 rounded-full">
-          <User size={20} className="text-teal-100" />
-        </div>
-      </Link>
+      {session?.user ? (
+        <Link href={`/members/${session.user.id}`} className="flex items-center space-x-2 hover:bg-teal-700 p-1 rounded-lg transition-colors">
+          <span className="text-sm font-medium hidden sm:block">
+            {displayName}
+          </span>
+          <div className="bg-teal-700 p-1.5 rounded-full">
+            <User size={20} className="text-teal-100" />
+          </div>
+        </Link>
+      ) : (
+        <Link href="/login" className="text-sm font-medium hover:text-teal-200">
+          Login
+        </Link>
+      )}
     </header>
   );
 }

@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { Geist, Geist_Mono } from "next/font/google";
 import { MobileShell } from '../components/layout/MobileShell';
+import { Providers } from '../components/Providers';
 import './globals.css';
 
 const geistSans = Geist({
@@ -25,12 +26,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-        <MobileShell
-          groupName="Kaberks">
-          {children}
-        </MobileShell>
+        <Providers>
+          <MobileShell
+            groupName="Kaberks">
+            {children}
+          </MobileShell>
+        </Providers>
       </body>
     </html>
   );
