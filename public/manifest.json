@@ -1,0 +1,16 @@
+{
+  "name": "Tampuhay App",
+  "short_name": "Tampuhay",
+  "description": "Informal Savings Group Manager",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#0d9488",
+  "icons": [
+    {
+      "src": "/file.svg",
+      "sizes": "192x192",
+      "type": "image/svg+xml"
+    }
+  ]
+}
