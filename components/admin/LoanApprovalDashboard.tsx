@@ -13,7 +13,7 @@ export default function LoanApprovalDashboard() {
   const pendingLoans = activeLoans.filter((l) => l.status === 'PENDING');
   console.log('pending loans', pendingLoans);
 
-  const getMemberName = (memberId: string) => {
+  const getMemberName = (memberId: number) => {
     const name = members.find((m) => m.id === memberId)?.name || 'Unknown';
     return name.charAt(0).toUpperCase() + name.slice(1);
   }
@@ -31,7 +31,7 @@ export default function LoanApprovalDashboard() {
     }
   }
 
-  const getRiskLevel = (memberId: string, principal: number) => {
+  const getRiskLevel = (memberId: number, principal: number) => {
     const member = members.find((m) => m.id === memberId);
     if (!member) return 'Unknown';
 
@@ -42,13 +42,13 @@ export default function LoanApprovalDashboard() {
     return 'HIGH';
   }
 
-  const handleApprove = (loanId: string, memberName: string) => {
+  const handleApprove = (loanId: number, memberName: string) => {
     if (confirm(`Approve loan for ${memberName}?`)) {
       approveLoan(loanId);
     }
   };
 
-  const handleReject = (loanId: string, memberName: string) => {
+  const handleReject = (loanId: number, memberName: string) => {
     if (confirm(`Reject loan for ${memberName}?`)) {
       rejectLoan(loanId);
     }

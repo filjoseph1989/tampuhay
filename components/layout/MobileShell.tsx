@@ -1,6 +1,9 @@
-import React from 'react';
+'use client';
+
+import React, { useEffect } from 'react';
 import { TopBar } from './TopBar';
 import { BottomNav } from './BottomNav';
+import { useGroupStore } from '@/store/useGroupStore';
 
 interface MobileShellProps {
   children: React.ReactNode;
@@ -9,6 +12,12 @@ interface MobileShellProps {
 }
 
 export function MobileShell({ children, groupName }: MobileShellProps) {
+  const fetchData = useGroupStore((state) => state.fetchData);
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
+
   return (
     <div className="min-h-screen bg-gray-50 pb-20 pt-16 font-sans">
       {/*

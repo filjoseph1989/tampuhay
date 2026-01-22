@@ -15,7 +15,7 @@ export default function ActiveLoansManager() {
 
   const activeLoansList = activeLoans.filter((l) => l.status === 'ACTIVE');
 
-  const handleRepay = (loanId: string, memberName: string) => {
+  const handleRepay = (loanId: number, memberName: string) => {
     const amount = parseFloat(repayAmount[loanId]);
     if (isNaN(amount) || amount <= 0) {
       alert('Please enter a valid amount');

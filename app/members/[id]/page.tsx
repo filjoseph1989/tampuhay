@@ -11,16 +11,17 @@ import { PiggyBank, Receipt, CreditCard } from 'lucide-react';
 export default function MemberDetailPage() {
   const { id } = useParams();
   const { members, transactions, activeLoans } = useGroupStore();
+  const memberId = parseInt(Array.isArray(id) ? id[0] : id);
 
-  const member = useMemo(() => members.find((m) => m.id === id), [members, id]);
+  const member = useMemo(() => members.find((m) => m.id === memberId), [members, memberId]);
   
   const memberTransactions = useMemo(() => 
-    transactions.filter((t) => t.memberId === id), 
-  [transactions, id]);
+    transactions.filter((t) => t.memberId === memberId), 
+  [transactions, memberId]);
 
   const memberLoans = useMemo(() => 
-    activeLoans.filter((l) => l.memberId === id && l.status === 'ACTIVE'), 
-  [activeLoans, id]);
+    activeLoans.filter((l) => l.memberId === memberId && l.status === 'ACTIVE'), 
+  [activeLoans, memberId]);
 
   const totalLoanBalance = useMemo(() => 
     memberLoans.reduce((sum, l) => sum + (l.principal - l.amountPaid), 0), 

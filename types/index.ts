@@ -2,7 +2,7 @@ export type TransactionType = 'CONTRIBUTION' | 'LOAN_PAYMENT' | 'LOAN_DISBURSEME
 export type LoanStatus = 'PENDING' | 'ACTIVE' | 'PAID' | 'DEFAULTED' | 'REJECTED';
 
 export interface Member {
-    id: string;
+    id: number;
     name: string;
     role: 'TREASURER' | 'MEMBER' | 'KABERK';
     totalSaved: number;
@@ -10,8 +10,8 @@ export interface Member {
 }
 
 export interface Transaction {
-    id: string;
-    memberId: string;
+    id: number;
+    memberId: number;
     type: TransactionType;
     amount: number;
     date: string;
@@ -25,8 +25,8 @@ export interface GroupState {
 }
 
 export interface Loan {
-    id: string;
-    memberId: string;
+    id: number;
+    memberId: number;
     type: 'STANDARD' | 'AUTO_CONTRIBUTION';
     principal: number;
     interestRate: number;

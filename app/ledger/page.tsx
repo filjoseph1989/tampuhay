@@ -14,7 +14,7 @@ export default function LedgerPage() {
 
   const filteredTransactions = useMemo(() => {
     return transactions.filter((tx) => {
-      const matchesMember = selectedMemberId ? tx.memberId === selectedMemberId : true;
+      const matchesMember = selectedMemberId ? tx.memberId === parseInt(selectedMemberId) : true;
       const matchesType = selectedType ? tx.type === selectedType : true;
       return matchesMember && matchesType;
     });
