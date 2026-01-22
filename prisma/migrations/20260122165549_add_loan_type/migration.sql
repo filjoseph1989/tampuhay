@@ -1,0 +1,5 @@
+-- CreateEnum
+CREATE TYPE "LoanType" AS ENUM ('STANDARD', 'AUTO_CONTRIBUTION');
+
+-- AlterTable
+ALTER TABLE "Loan" ADD COLUMN     "type" "LoanType" NOT NULL DEFAULT 'STANDARD';

@@ -7,7 +7,7 @@ import { Button } from '../ui/Button';
 interface AddTransactionFormProps {
   members: Member[];
   addTransaction: (transaction: {
-    memberId: string;
+    memberId: number;
     amount: number;
     type: TransactionType;
     date: string;
@@ -27,7 +27,7 @@ export default function AddTransactionForm({ members, addTransaction }: AddTrans
     if (!formData.memberId || !formData.amount) return;
 
     addTransaction({
-      memberId: formData.memberId,
+      memberId: parseInt(formData.memberId),
       amount: parseFloat(formData.amount),
       type: formData.type,
       date: new Date(formData.date).toISOString(),
