@@ -2,18 +2,26 @@ import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { calculateLoan } from '@/lib/loanCalculator';
 import { TransactionType } from '@prisma/client';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/lib/auth';
 
 export async function PATCH(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const session = await getServerSession(authOptions);
+  if (!session || session.user.role !== 'TREASURER') {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
   try {
     const { id } = await params;
+    const loanId = parseInt(id);
     const body = await request.json();
     const { action, amount } = body;
 
     const loan = await prisma.loan.findUnique({
-      where: { id },
+      where: { id: loanId },
       include: { member: true },
     });
 

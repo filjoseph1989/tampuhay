@@ -4,9 +4,11 @@ import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Home, BookOpen, PlusCircle } from 'lucide-react';
+import { useSession } from 'next-auth/react';
 
 export function BottomNav() {
   const pathname = usePathname();
+  const { data: session } = useSession();
 
   const isActive = (path: string) => {
     return pathname === path ? 'text-teal-600' : 'text-gray-500 hover:text-teal-500';
@@ -25,10 +27,12 @@ export function BottomNav() {
           <span className="text-[10px] font-medium uppercase">Ledger</span>
         </Link>
 
-        <Link href="/admin" className={`flex flex-col items-center justify-center w-full h-full space-y-1 ${isActive('/admin')}`}>
-          <PlusCircle size={24} />
-          <span className="text-[10px] font-medium uppercase">Admin</span>
-        </Link>
+        {session?.user?.role === 'TREASURER' && (
+          <Link href="/admin" className={`flex flex-col items-center justify-center w-full h-full space-y-1 ${isActive('/admin')}`}>
+            <PlusCircle size={24} />
+            <span className="text-[10px] font-medium uppercase">Admin</span>
+          </Link>
+        )}
       </div>
     </nav>
   );
