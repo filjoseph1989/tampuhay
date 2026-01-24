@@ -37,7 +37,7 @@ export async function PATCH(
     const effectiveCycleId = activeCycle?.id || 1;
 
     if (action === 'APPROVE') {
-      const { netProceeds, interest } = calculateLoan(
+      const { netProceeds } = calculateLoan(
         loan.principal,
         loan.interestRate,
         loan.member.role
@@ -50,22 +50,12 @@ export async function PATCH(
           data: { status: 'ACTIVE' },
         });
 
-        // 2. Disbursement Transaction
+        // 2. Disbursement Transaction (Full Amount)
         await tx.transaction.create({
           data: {
             memberId: loan.memberId,
             type: 'LOAN_DISBURSEMENT' as TransactionType,
             amount: netProceeds,
-            cycleId: effectiveCycleId,
-          },
-        });
-
-        // 3. Interest Transaction
-        await tx.transaction.create({
-          data: {
-            memberId: loan.memberId,
-            type: 'INTEREST_EARNED' as TransactionType,
-            amount: interest,
             cycleId: effectiveCycleId,
           },
         });
@@ -80,7 +70,13 @@ export async function PATCH(
       if (!amount) return NextResponse.json({ error: 'Amount required' }, { status: 400 });
 
       const newAmountPaid = loan.amountPaid + parseFloat(amount);
-      const isFullyPaid = newAmountPaid >= loan.principal;
+      
+      // Recalculate total owed based on role
+      const effectiveRate = (loan.member.role === 'KABERK' || loan.member.role === 'TREASURER') ? loan.interestRate : 10;
+      const interest = loan.principal * (effectiveRate / 100);
+      const totalOwed = loan.principal + interest;
+      
+      const isFullyPaid = newAmountPaid >= totalOwed;
 
       const updatedLoan = await prisma.$transaction(async (tx) => {
         const l = await tx.loan.update({
@@ -99,6 +95,13 @@ export async function PATCH(
             cycleId: effectiveCycleId,
           },
         });
+
+        // If fully paid, record the interest earned separately?
+        // Current logic: LOAN_PAYMENT increases pot.
+        // Disbursement decreased pot.
+        // Net effect = Interest.
+        // So we don't strictly need a separate INTEREST_EARNED transaction unless we want specific reporting.
+        // For now, simple Pot tracking works.
 
         return l;
       });

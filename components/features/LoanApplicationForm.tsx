@@ -38,8 +38,8 @@ export default function LoanApplicationForm({
     e.preventDefault();
     if (!member || !agreed) return;
     setIsSubmitting(true);
-    await new Promise(resolve => setTimeout(resolve, 1000)); // This is for API
-    requestLoan({
+    
+    await requestLoan({
       memberId: member.id,
       type: 'STANDARD',
       principal: amount,
@@ -47,6 +47,7 @@ export default function LoanApplicationForm({
       startDate: new Date().toISOString(),
       dueDate: dueDate.toISOString(),
     });
+    
     setIsSubmitting(false);
     if (onSuccess) onSuccess();
   }

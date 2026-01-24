@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { Card } from '@/components/ui/Card';
 import { Input } from '@/components/ui/Input';
 import { Button } from '@/components/ui/Button';
+import { toast } from 'sonner';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -24,10 +25,11 @@ export default function LoginPage() {
     });
 
     if (result?.ok) {
+      toast.success('Logged in successfully');
       router.push('/');
       router.refresh();
     } else {
-      alert('Login failed. Please check your credentials.');
+      toast.error('Login failed. Please check your credentials.');
       setIsLoading(false);
     }
   };
