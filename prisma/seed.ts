@@ -1,9 +1,12 @@
 import { PrismaClient, Role } from '@prisma/client'
+import { hash } from 'bcryptjs'
 
 const prisma = new PrismaClient()
 
 async function main() {
   console.log('🌱 Seeding database...')
+  
+  const password = await hash('password123', 12)
 
   // 1. Create a Default Cycle
   const cycle = await prisma.cycle.upsert({
@@ -38,12 +41,14 @@ async function main() {
       update: {
         name: member.name,
         role: member.role,
+        password,
       },
       create: {
         id: member.id,
         name: member.name,
         email: member.email,
         role: member.role,
+        password,
         totalSaved: 0,
         numberOfShares: 0,
       },

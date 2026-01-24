@@ -15,7 +15,7 @@ export function Button({
   ...props
 }: ButtonProps) {
   const baseStyles = 'font-bold rounded-xl transition-all duration-200 shadow-sm active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center';
-  
+
   const variants = {
     primary: 'bg-teal-600 text-white hover:bg-teal-700 shadow-teal-100',
     secondary: 'bg-gray-100 text-gray-700 hover:bg-gray-200 shadow-gray-50',
@@ -34,8 +34,7 @@ export function Button({
   return (
     <button
       className={`${baseStyles} ${variants[variant]} ${sizes[size]} ${widthStyle} ${className}`}
-      {...props}
-    >
+      {...props}>
       {children}
     </button>
   );

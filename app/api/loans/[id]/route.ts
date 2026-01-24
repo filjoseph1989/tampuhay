@@ -39,7 +39,7 @@ export async function PATCH(
       const updatedLoan = await prisma.$transaction(async (tx) => {
         // 1. Update loan status
         const l = await tx.loan.update({
-          where: { id },
+          where: { id: loanId },
           data: { status: 'ACTIVE' },
         });
 
@@ -49,7 +49,7 @@ export async function PATCH(
             memberId: loan.memberId,
             type: 'LOAN_DISBURSEMENT' as TransactionType,
             amount: netProceeds,
-            cycleId: 'default-cycle',
+            cycleId: 1, // Default cycle ID integer
           },
         });
 
@@ -59,7 +59,7 @@ export async function PATCH(
             memberId: loan.memberId,
             type: 'INTEREST_EARNED' as TransactionType,
             amount: interest,
-            cycleId: 'default-cycle',
+            cycleId: 1, // Default cycle ID integer
           },
         });
 
@@ -77,7 +77,7 @@ export async function PATCH(
 
       const updatedLoan = await prisma.$transaction(async (tx) => {
         const l = await tx.loan.update({
-          where: { id },
+          where: { id: loanId },
           data: {
             amountPaid: newAmountPaid,
             status: isFullyPaid ? 'PAID' : 'ACTIVE',
@@ -89,7 +89,7 @@ export async function PATCH(
             memberId: loan.memberId,
             type: 'LOAN_PAYMENT' as TransactionType,
             amount: parseFloat(amount),
-            cycleId: 'default-cycle',
+            cycleId: 1, // Default cycle ID integer
           },
         });
 
@@ -101,7 +101,7 @@ export async function PATCH(
 
     if (action === 'REJECT') {
       const updatedLoan = await prisma.loan.update({
-        where: { id },
+        where: { id: loanId },
         data: { status: 'REJECTED' },
       });
       return NextResponse.json(updatedLoan);
