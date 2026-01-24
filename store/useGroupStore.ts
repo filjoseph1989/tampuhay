@@ -14,10 +14,12 @@ interface GroupStore {
   rejectLoan: (loanId: number) => Promise<void>;
   addTransaction: (transaction: Omit<Transaction, 'id'>) => Promise<void>;
   requestLoan: (loan: Omit<Loan, 'id'|'status'|'amountPaid'>) => Promise<void>;
-  repayLoan: (loanId: number, amount: number) => Promise<void>;
-
-  // Still sync for now (UI only)
-  setShareValue: (value: number) => void;
+    repayLoan: (loanId: number, amount: number) => Promise<void>;
+    convertToAutoLoan: (memberId: number, amount: number) => Promise<void>;
+    rolloverLoan: (loanId: number) => Promise<void>;
+    
+    // Still sync for now (UI only)
+    setShareValue: (value: number) => void;
   updateMemberShares: (memberId: number, shares: number) => void;
 }
 
@@ -134,6 +136,14 @@ export const useGroupStore = create<GroupStore>((set, get) => ({
     } catch (error) {
       console.error('Error repaying loan:', error);
     }
+  },
+
+  convertToAutoLoan: async (memberId, amount) => {
+    console.log('convertToAutoLoan not implemented yet');
+  },
+
+  rolloverLoan: async (loanId) => {
+    console.log('rolloverLoan not implemented yet');
   },
 
   setShareValue: (value) => {

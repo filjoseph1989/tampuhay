@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/Button';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
 
@@ -19,13 +20,14 @@ export default function LoginPage() {
     const result = await signIn('credentials', {
       redirect: false,
       email,
+      password,
     });
 
     if (result?.ok) {
       router.push('/');
       router.refresh();
     } else {
-      alert('Login failed. Please check your email.');
+      alert('Login failed. Please check your credentials.');
       setIsLoading(false);
     }
   };
@@ -47,17 +49,22 @@ export default function LoginPage() {
             onChange={(e) => setEmail(e.target.value)}
             required
           />
+          <Input
+            type="password"
+            label="Password"
+            placeholder="••••••••"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+          />
           <Button type="submit" fullWidth disabled={isLoading}>
             {isLoading ? 'Signing in...' : 'Sign In'}
           </Button>
         </form>
 
         <div className="text-center text-xs text-gray-400">
-          <p>Available test accounts:</p>
-          <ul className="mt-2 space-y-1">
-            <li>fil@example.com (Treasurer)</li>
-            <li>romel@example.com (Member)</li>
-          </ul>
+          <p>Default password for all accounts:</p>
+          <p className="font-mono">password123</p>
         </div>
       </Card>
     </div>

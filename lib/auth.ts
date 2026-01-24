@@ -2,9 +2,9 @@ import { NextAuthOptions } from "next-auth";
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import CredentialsProvider from "next-auth/providers/credentials";
 import prisma from "@/lib/prisma";
+import { compare } from "bcryptjs";
 
 export const authOptions: NextAuthOptions = {
-  // @ts-expect-error - Adapter type mismatch with Int IDs is possible, suppressing for now
   adapter: PrismaAdapter(prisma),
   secret: process.env.NEXTAUTH_SECRET || "fallback-secret-for-dev",
   session: {
@@ -15,17 +15,21 @@ export const authOptions: NextAuthOptions = {
       name: "Email",
       credentials: {
         email: { label: "Email", type: "email", placeholder: "fil@example.com" },
+        password: { label: "Password", type: "password" }
       },
       async authorize(credentials) {
-        if (!credentials?.email) return null;
+        if (!credentials?.email || !credentials.password) return null;
 
         const user = await prisma.user.findUnique({
           where: { email: credentials.email },
         });
 
-        if (!user) return null;
+        if (!user || !user.password) return null;
 
-        // For prototype: No password check, just email existence
+        const isValid = await compare(credentials.password, user.password);
+
+        if (!isValid) return null;
+
         return {
           id: user.id,
           name: user.name,
@@ -39,7 +43,7 @@ export const authOptions: NextAuthOptions = {
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
-        token.id = user.id;
+        token.id = Number(user.id);
         token.role = user.role;
       }
       return token;

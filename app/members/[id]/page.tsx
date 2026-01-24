@@ -1,17 +1,26 @@
 'use client';
 
-import React, { useMemo } from 'react';
-import { useParams } from 'next/navigation';
+import React, { useMemo, useState } from 'react';
+import { useParams, useRouter } from 'next/navigation';
 import { useGroupStore } from '@/store/useGroupStore';
 import TransactionFeed from '@/components/ledger/TransactionFeed';
 import { Card } from '@/components/ui/Card';
+import { Button } from '@/components/ui/Button';
+import { Input } from '@/components/ui/Input';
 import { formatMoney } from '@/lib/currency';
-import { PiggyBank, Receipt, CreditCard } from 'lucide-react';
+import { PiggyBank, Receipt, CreditCard, Edit2, X, Check } from 'lucide-react';
+import { useSession } from 'next-auth/react';
 
 export default function MemberDetailPage() {
   const { id } = useParams();
-  const { members, transactions, activeLoans } = useGroupStore();
-  const memberId = parseInt(Array.isArray(id) ? id[0] : id);
+  const { data: session } = useSession();
+  const router = useRouter();
+  const { members, transactions, activeLoans, fetchData } = useGroupStore();
+  const memberId = id ? parseInt(Array.isArray(id) ? id[0] : id) : 0;
+
+  const [isEditing, setIsEditing] = useState(false);
+  const [newName, setNewName] = useState('');
+  const [isSaving, setIsSaving] = useState(false);
 
   const member = useMemo(() => members.find((m) => m.id === memberId), [members, memberId]);
   
@@ -27,6 +36,38 @@ export default function MemberDetailPage() {
     memberLoans.reduce((sum, l) => sum + (l.principal - l.amountPaid), 0), 
   [memberLoans]);
 
+  const canEdit = session?.user?.id === memberId;
+
+  const handleEditClick = () => {
+    setNewName(member?.name || '');
+    setIsEditing(true);
+  };
+
+  const handleSave = async () => {
+    if (!newName.trim()) return;
+    setIsSaving(true);
+    try {
+      const res = await fetch('/api/members/me', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: newName }),
+      });
+
+      if (res.ok) {
+        await fetchData(); // Refresh data
+        router.refresh();  // Refresh server components/session if needed
+        setIsEditing(false);
+      } else {
+        alert('Failed to update profile');
+      }
+    } catch (error) {
+      console.error(error);
+      alert('An error occurred');
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
   if (!member) {
     return (
       <div className="p-8 text-center">
@@ -37,7 +78,35 @@ export default function MemberDetailPage() {
 
   return (
     <div className="p-4 space-y-6">
-      <h1 className="text-2xl font-bold text-teal-800">{member.name}</h1>
+      <div className="flex justify-between items-center">
+        {isEditing ? (
+          <div className="flex items-center gap-2 w-full">
+            <Input 
+              value={newName} 
+              onChange={(e) => setNewName(e.target.value)} 
+              className="flex-1"
+              placeholder="Your Name"
+            />
+            <Button size="sm" onClick={handleSave} disabled={isSaving}>
+              <Check size={16} />
+            </Button>
+            <Button size="sm" variant="secondary" onClick={() => setIsEditing(false)} disabled={isSaving}>
+              <X size={16} />
+            </Button>
+          </div>
+        ) : (
+          <>
+            <h1 className="text-2xl font-bold text-teal-800">{member.name}</h1>
+            {canEdit && (
+              <button 
+                onClick={handleEditClick}
+                className="text-gray-400 hover:text-teal-600 transition-colors">
+                <Edit2 size={18} />
+              </button>
+            )}
+          </>
+        )}
+      </div>
 
       {/* Summary Stats */}
       <div className="grid grid-cols-1 gap-4">

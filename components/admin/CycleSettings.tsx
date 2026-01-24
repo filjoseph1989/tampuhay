@@ -20,7 +20,7 @@ export default function CycleSettings() {
     }
   };
 
-  const handleMemberShareChange = (memberId: string, newShares: number) => {
+  const handleMemberShareChange = (memberId: number, newShares: number) => {
     if (newShares < 1) return;
     updateMemberShares(memberId, newShares);
   };

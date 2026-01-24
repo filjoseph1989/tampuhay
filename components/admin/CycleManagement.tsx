@@ -13,7 +13,7 @@ export default function CycleManagement() {
   const SHARE_VALUE = useGroupStore((state) => state.groupState.shareValue);
 
   // --- LOGIC 1: UNPAID SHARE CAPITAL ---
-  const getMissingContribution = (memberId: string, numberOfShares: number) => {
+  const getMissingContribution = (memberId: number, numberOfShares: number) => {
     const requiredAmount = numberOfShares * SHARE_VALUE;
     const totalContributed = transactions
       .filter((t) => t.memberId === memberId && t.type === 'CONTRIBUTION')
@@ -28,7 +28,7 @@ export default function CycleManagement() {
     }))
     .filter((m) => m.missingAmount > 0);
 
-  const handleConvert = (memberId: string, amount: number) => {
+  const handleConvert = (memberId: number, amount: number) => {
     if (confirm(`Convert ${formatMoney(amount)} (Unpaid Share Capital) for this member to an Auto-Loan?`)) {
       convertToAutoLoan(memberId, amount);
     }
@@ -42,7 +42,7 @@ export default function CycleManagement() {
     return dueDate < now;
   });
 
-  const handleRollover = (loanId: string, currentPrincipal: number, memberName: string) => {
+  const handleRollover = (loanId: number, currentPrincipal: number, memberName: string) => {
     const newPrincipal = currentPrincipal + (currentPrincipal * 0.05);
     if (confirm(`Rollover Loan for ${memberName}?\n\nCurrent Principal: ${formatMoney(currentPrincipal)}\nNew Principal (+5%): ${formatMoney(newPrincipal)}\n\nThis will mark the old loan as Paid and create a new one.`)) {
       rolloverLoan(loanId);
