@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { GroupState, Member, Transaction, Loan } from '../types';
+import { toast } from 'sonner';
 
 interface GroupStore {
   groupState: GroupState;
@@ -84,9 +85,15 @@ export const useGroupStore = create<GroupStore>((set, get) => ({
         method: 'PATCH',
         body: JSON.stringify({ action: 'APPROVE' }),
       });
-      if (res.ok) await get().fetchData();
+      if (res.ok) {
+        await get().fetchData();
+        toast.success('Loan approved successfully');
+      } else {
+        toast.error('Failed to approve loan');
+      }
     } catch (error) {
       console.error('Error approving loan:', error);
+      toast.error('An error occurred');
     }
   },
 
@@ -96,9 +103,15 @@ export const useGroupStore = create<GroupStore>((set, get) => ({
         method: 'PATCH',
         body: JSON.stringify({ action: 'REJECT' }),
       });
-      if (res.ok) await get().fetchData();
+      if (res.ok) {
+        await get().fetchData();
+        toast.success('Loan rejected');
+      } else {
+        toast.error('Failed to reject loan');
+      }
     } catch (error) {
       console.error('Error rejecting loan:', error);
+      toast.error('An error occurred');
     }
   },
 
@@ -108,9 +121,15 @@ export const useGroupStore = create<GroupStore>((set, get) => ({
         method: 'POST',
         body: JSON.stringify(newTx),
       });
-      if (res.ok) await get().fetchData();
+      if (res.ok) {
+        await get().fetchData();
+        toast.success('Transaction recorded');
+      } else {
+        toast.error('Failed to add transaction');
+      }
     } catch (error) {
       console.error('Error adding transaction:', error);
+      toast.error('An error occurred');
     }
   },
 
@@ -120,9 +139,15 @@ export const useGroupStore = create<GroupStore>((set, get) => ({
         method: 'POST',
         body: JSON.stringify(newLoan),
       });
-      if (res.ok) await get().fetchData();
+      if (res.ok) {
+        await get().fetchData();
+        toast.success('Loan requested successfully');
+      } else {
+        toast.error('Failed to request loan');
+      }
     } catch (error) {
       console.error('Error requesting loan:', error);
+      toast.error('An error occurred');
     }
   },
 
@@ -132,9 +157,15 @@ export const useGroupStore = create<GroupStore>((set, get) => ({
         method: 'PATCH',
         body: JSON.stringify({ action: 'REPAY', amount }),
       });
-      if (res.ok) await get().fetchData();
+      if (res.ok) {
+        await get().fetchData();
+        toast.success('Payment recorded');
+      } else {
+        toast.error('Failed to record payment');
+      }
     } catch (error) {
       console.error('Error repaying loan:', error);
+      toast.error('An error occurred');
     }
   },
 
@@ -144,9 +175,15 @@ export const useGroupStore = create<GroupStore>((set, get) => ({
         method: 'POST',
         body: JSON.stringify({ memberId, amount }),
       });
-      if (res.ok) await get().fetchData();
+      if (res.ok) {
+        await get().fetchData();
+        toast.success('Converted to Auto-Loan');
+      } else {
+        toast.error('Failed to convert');
+      }
     } catch (error) {
       console.error('Error converting to auto-loan:', error);
+      toast.error('An error occurred');
     }
   },
 
@@ -156,9 +193,15 @@ export const useGroupStore = create<GroupStore>((set, get) => ({
         method: 'POST',
         body: JSON.stringify({ loanId }),
       });
-      if (res.ok) await get().fetchData();
+      if (res.ok) {
+        await get().fetchData();
+        toast.success('Loan Rollover successful');
+      } else {
+        toast.error('Failed to rollover loan');
+      }
     } catch (error) {
       console.error('Error rolling over loan:', error);
+      toast.error('An error occurred');
     }
   },
 

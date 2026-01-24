@@ -10,6 +10,7 @@ import { Input } from '@/components/ui/Input';
 import { formatMoney } from '@/lib/currency';
 import { PiggyBank, Receipt, CreditCard, Edit2, X, Check } from 'lucide-react';
 import { useSession } from 'next-auth/react';
+import { toast } from 'sonner';
 
 export default function MemberDetailPage() {
   const { id } = useParams();
@@ -28,12 +29,16 @@ export default function MemberDetailPage() {
     transactions.filter((t) => t.memberId === memberId), 
   [transactions, memberId]);
 
-  const activeLoansList = useMemo(() => 
+  const memberLoans = useMemo(() => 
     activeLoans.filter((l) => l.memberId === memberId && l.status === 'ACTIVE'), 
   [activeLoans, memberId]);
 
   const allMemberLoans = useMemo(() => 
     activeLoans.filter((l) => l.memberId === memberId),
+  [activeLoans, memberId]);
+
+  const activeLoansList = useMemo(() => 
+    activeLoans.filter((l) => l.memberId === memberId && l.status === 'ACTIVE'), 
   [activeLoans, memberId]);
 
   const totalLoanBalance = useMemo(() => 
@@ -61,12 +66,13 @@ export default function MemberDetailPage() {
         await fetchData(); // Refresh data
         router.refresh();  // Refresh server components/session if needed
         setIsEditing(false);
+        toast.success('Profile updated successfully');
       } else {
-        alert('Failed to update profile');
+        toast.error('Failed to update profile');
       }
     } catch (error) {
       console.error(error);
-      alert('An error occurred');
+      toast.error('An error occurred');
     } finally {
       setIsSaving(false);
     }

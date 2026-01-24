@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/Input';
 import { formatMoney } from '@/lib/currency';
 import { getMemberName } from '@/lib/utils';
 import { AlertCircle } from 'lucide-react';
+import { toast } from 'sonner';
 
 export default function ActiveLoansManager() {
   const { activeLoans, members, repayLoan } = useGroupStore();
@@ -18,7 +19,7 @@ export default function ActiveLoansManager() {
   const handleRepay = (loanId: number, memberName: string) => {
     const amount = parseFloat(repayAmount[loanId]);
     if (isNaN(amount) || amount <= 0) {
-      alert('Please enter a valid amount');
+      toast.error('Please enter a valid amount');
       return;
     }
 
