@@ -41,9 +41,14 @@ export default function MemberDetailPage() {
     activeLoans.filter((l) => l.memberId === memberId && l.status === 'ACTIVE'), 
   [activeLoans, memberId]);
 
-  const totalLoanBalance = useMemo(() => 
-    activeLoansList.reduce((sum, l) => sum + (l.principal - l.amountPaid), 0), 
-  [activeLoansList]);
+  const totalLoanBalance = useMemo(() => {
+    return activeLoansList.reduce((sum, l) => {
+      const effectiveRate = (member?.role === 'KABERK' || member?.role === 'TREASURER') ? l.interestRate : 10;
+      const interest = l.principal * (effectiveRate / 100);
+      const totalOwed = l.principal + interest;
+      return sum + (totalOwed - l.amountPaid);
+    }, 0);
+  }, [activeLoansList, member?.role]);
 
   const canEdit = session?.user?.id === memberId;
 
@@ -155,13 +160,18 @@ export default function MemberDetailPage() {
           </div>
           <div className="space-y-3">
             {allMemberLoans.map((loan) => {
-              const balance = loan.principal - loan.amountPaid;
-              const percentPaid = Math.round((loan.amountPaid / loan.principal) * 100);
+              const effectiveRate = (member?.role === 'KABERK' || member?.role === 'TREASURER') ? loan.interestRate : 10;
+              const interest = loan.principal * (effectiveRate / 100);
+              const totalOwed = loan.principal + interest;
+              const balance = totalOwed - loan.amountPaid;
+              const percentPaid = Math.round((loan.amountPaid / totalOwed) * 100);
               return (
                 <Card key={loan.id} className="p-4 border-l-4 border-teal-500">
                   <div className="flex justify-between items-start mb-2">
                     <div>
-                      <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{loan.type.replace('_', ' ')}</p>
+                      <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">
+                        {loan.type.replace('_', ' ')} ({effectiveRate}%)
+                      </p>
                       <p className="text-lg font-black text-gray-900">{formatMoney(loan.principal)}</p>
                     </div>
                     <span className={`text-[10px] font-bold px-2 py-1 rounded uppercase ${
@@ -179,7 +189,7 @@ export default function MemberDetailPage() {
                         <span className="text-gray-400">{percentPaid}% Paid</span>
                       </div>
                       <div className="w-full bg-gray-100 h-1.5 rounded-full overflow-hidden">
-                        <div className="bg-teal-500 h-full transition-all" style={{ width: `${percentPaid}%` }} />
+                        <div className="bg-teal-500 h-full transition-all" style={{ width: `${Math.min(percentPaid, 100)}%` }} />
                       </div>
                       <p className="text-[10px] text-gray-400">Due: {new Date(loan.dueDate).toLocaleDateString()}</p>
                     </div>

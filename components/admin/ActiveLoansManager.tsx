@@ -26,7 +26,13 @@ export default function ActiveLoansManager() {
     const loan = activeLoansList.find(l => l.id === loanId);
     if (!loan) return;
 
-    const balance = loan.principal - loan.amountPaid;
+    const member = members.find((m) => m.id === loan.memberId);
+    const role = member?.role || 'MEMBER';
+    const effectiveRate = (role === 'KABERK' || role === 'TREASURER') ? loan.interestRate : 10;
+    const interest = loan.principal * (effectiveRate / 100);
+    const totalOwed = loan.principal + interest;
+    const balance = totalOwed - loan.amountPaid;
+
     if (amount > balance + 0.01) { // small buffer for floating point
       if (!confirm(`Amount ${formatMoney(amount)} is more than the remaining balance ${formatMoney(balance)}. Continue?`)) {
         return;
@@ -50,8 +56,15 @@ export default function ActiveLoansManager() {
   return (
     <div className="space-y-4">
       {activeLoansList.map((loan) => {
-        const memberName = getMemberName(members, loan.memberId);
-        const balance = loan.principal - loan.amountPaid;
+        const member = members.find((m) => m.id === loan.memberId);
+        const memberName = member?.name || 'Unknown';
+        const role = member?.role || 'MEMBER';
+        
+        const effectiveRate = (role === 'KABERK' || role === 'TREASURER') ? loan.interestRate : 10;
+        const interest = loan.principal * (effectiveRate / 100);
+        const totalOwed = loan.principal + interest;
+        const balance = totalOwed - loan.amountPaid;
+        
         const isPastDue = new Date(loan.dueDate) < new Date();
 
         return (
@@ -105,11 +118,11 @@ export default function ActiveLoansManager() {
               <div className="w-full bg-gray-100 h-1.5 rounded-full overflow-hidden">
                 <div
                   className="bg-green-500 h-full transition-all"
-                  style={{ width: `${(loan.amountPaid / loan.principal) * 100}%` }}
+                  style={{ width: `${Math.min((loan.amountPaid / totalOwed) * 100, 100)}%` }}
                 />
               </div>
               <span className="text-[10px] text-gray-400 ml-3 whitespace-nowrap font-bold">
-                {Math.round((loan.amountPaid / loan.principal) * 100)}% Paid
+                {Math.round((loan.amountPaid / totalOwed) * 100)}% Paid
               </span>
             </div>
           </Card>
