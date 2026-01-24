@@ -15,11 +15,10 @@ interface GroupStore {
   rejectLoan: (loanId: number) => Promise<void>;
   addTransaction: (transaction: Omit<Transaction, 'id'>) => Promise<void>;
   requestLoan: (loan: Omit<Loan, 'id'|'status'|'amountPaid'>) => Promise<void>;
-    repayLoan: (loanId: number, amount: number) => Promise<void>;
-    convertToAutoLoan: (memberId: number, amount: number) => Promise<void>;
-    rolloverLoan: (loanId: number) => Promise<void>;
-    
-    setShareValue: (value: number) => Promise<void>;
+  repayLoan: (loanId: number, amount: number) => Promise<void>;
+  convertToAutoLoan: (memberId: number, amount: number) => Promise<void>;
+  rolloverLoan: (loanId: number) => Promise<void>;
+  setShareValue: (value: number) => Promise<void>;
   updateMemberShares: (memberId: number, shares: number) => Promise<void>;
 }
 
@@ -47,9 +46,12 @@ export const useGroupStore = create<GroupStore>((set, get) => ({
       ]);
 
       const members = await membersRes.json();
-      const transactions = await txRes.json();
+      const transactionsData = await txRes.json();
       const activeLoans = await loansRes.json();
       const activeCycle = await cycleRes.json();
+      const transactions = Array.isArray(transactionsData)
+        ? transactionsData
+        : [];
 
       // Calculate total pot from transactions
       let totalPot = 0;
@@ -71,7 +73,7 @@ export const useGroupStore = create<GroupStore>((set, get) => ({
         members,
         transactions,
         activeLoans,
-        groupState: { 
+        groupState: {
           totalPot,
           cycleStart: activeCycle.startDate,
           targetPayoutDate: activeCycle.targetPayoutDate,

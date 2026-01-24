@@ -5,7 +5,7 @@ const prisma = new PrismaClient()
 
 async function main() {
   console.log('🌱 Seeding database...')
-  
+
   const password = await hash('password123', 12)
 
   // 1. Create a Default Cycle
@@ -23,16 +23,17 @@ async function main() {
 
   // 2. Create Mock Members
   const mockMembers = [
-    { id: 1, name: 'fil (Treasurer)', email: 'fil@example.com', role: Role.TREASURER },
-    { id: 2, name: 'romel', email: 'romel@example.com', role: Role.KABERK },
-    { id: 3, name: 'ronald', email: 'ronald@example.com', role: Role.MEMBER },
-    { id: 4, name: 'bernard', email: 'bernard@example.com', role: Role.KABERK },
-    { id: 5, name: 'charlotte', email: 'charlotte@example.com', role: Role.KABERK },
-    { id: 6, name: 'leslie', email: 'leslie@example.com', role: Role.KABERK },
-    { id: 7, name: 'rejean', email: 'rejean@example.com', role: Role.KABERK },
-    { id: 8, name: 'rodelyn', email: 'rodelyn@example.com', role: Role.KABERK },
-    { id: 9, name: 'connie', email: 'connie@example.com', role: Role.KABERK },
-    { id: 10, name: 'ailene', email: 'ailene@example.com', role: Role.KABERK },
+    { id: 1, name: 'treasurer', email: 'fil@example.com', role: Role.TREASURER },
+    { id: 2, name: 'ailene', email: 'ailene@example.com', role: Role.KABERK },
+    { id: 3, name: 'bernard', email: 'bernard@example.com', role: Role.KABERK },
+    { id: 4, name: 'charlotte', email: 'charlotte@example.com', role: Role.KABERK },
+    { id: 5, name: 'connie', email: 'connie@example.com', role: Role.KABERK },
+    { id: 6, name: 'fil', email: 'ailene@example.com', role: Role.KABERK },
+    { id: 7, name: 'leslie', email: 'leslie@example.com', role: Role.KABERK },
+    { id: 8, name: 'rejean', email: 'rejean@example.com', role: Role.KABERK },
+    { id: 9, name: 'rodelyn', email: 'rodelyn@example.com', role: Role.KABERK },
+    { id: 10, name: 'romel', email: 'romel@example.com', role: Role.KABERK },
+    { id: 11, name: 'ronald', email: 'ronald@example.com', role: Role.MEMBER },
   ]
 
   for (const member of mockMembers) {
