@@ -14,7 +14,7 @@ export async function PATCH(request: Request) {
     const { name, image } = body;
 
     const user = await prisma.user.update({
-      where: { id: session.user.id },
+      where: { id: Number(session.user.id) },
       data: {
         name: name || undefined,
         image: image || undefined,
