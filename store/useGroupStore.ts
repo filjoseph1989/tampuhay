@@ -19,9 +19,8 @@ interface GroupStore {
     convertToAutoLoan: (memberId: number, amount: number) => Promise<void>;
     rolloverLoan: (loanId: number) => Promise<void>;
     
-    // Still sync for now (UI only)
-    setShareValue: (value: number) => void;
-  updateMemberShares: (memberId: number, shares: number) => void;
+    setShareValue: (value: number) => Promise<void>;
+  updateMemberShares: (memberId: number, shares: number) => Promise<void>;
 }
 
 export const useGroupStore = create<GroupStore>((set, get) => ({
@@ -40,15 +39,17 @@ export const useGroupStore = create<GroupStore>((set, get) => ({
   fetchData: async () => {
     set({ isLoading: true });
     try {
-      const [membersRes, txRes, loansRes] = await Promise.all([
+      const [membersRes, txRes, loansRes, cycleRes] = await Promise.all([
         fetch('/api/members'),
         fetch('/api/transactions'),
         fetch('/api/loans'),
+        fetch('/api/cycles/active'),
       ]);
 
       const members = await membersRes.json();
       const transactions = await txRes.json();
       const activeLoans = await loansRes.json();
+      const activeCycle = await cycleRes.json();
 
       // Calculate total pot from transactions
       let totalPot = 0;
@@ -70,7 +71,12 @@ export const useGroupStore = create<GroupStore>((set, get) => ({
         members,
         transactions,
         activeLoans,
-        groupState: { ...get().groupState, totalPot },
+        groupState: { 
+          totalPot,
+          cycleStart: activeCycle.startDate,
+          targetPayoutDate: activeCycle.targetPayoutDate,
+          shareValue: activeCycle.shareValue
+        },
         isLoading: false
       });
     } catch (error) {
@@ -205,20 +211,39 @@ export const useGroupStore = create<GroupStore>((set, get) => ({
     }
   },
 
-  setShareValue: (value) => {
-    set((state) => ({
-      groupState: {
-        ...state.groupState,
-        shareValue: value,
-      },
-    }));
+  setShareValue: async (value) => {
+    try {
+      const res = await fetch('/api/cycles/active', {
+        method: 'PATCH',
+        body: JSON.stringify({ shareValue: value }),
+      });
+      if (res.ok) {
+        await get().fetchData();
+        toast.success('Share value updated');
+      } else {
+        toast.error('Failed to update share value');
+      }
+    } catch (error) {
+      console.error('Error updating share value:', error);
+      toast.error('An error occurred');
+    }
   },
 
-  updateMemberShares: (memberId, shares) => {
-    set((state) => ({
-      members: state.members.map((m) =>
-        m.id === memberId ? { ...m, numberOfShares: shares } : m
-      ),
-    }));
+  updateMemberShares: async (memberId, shares) => {
+    try {
+      const res = await fetch(`/api/members/${memberId}`, {
+        method: 'PATCH',
+        body: JSON.stringify({ numberOfShares: shares }),
+      });
+      if (res.ok) {
+        await get().fetchData();
+        toast.success('Member shares updated');
+      } else {
+        toast.error('Failed to update shares');
+      }
+    } catch (error) {
+      console.error('Error updating shares:', error);
+      toast.error('An error occurred');
+    }
   }
 }));
