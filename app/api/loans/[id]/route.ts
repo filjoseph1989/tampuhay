@@ -29,6 +29,13 @@ export async function PATCH(
       return NextResponse.json({ error: 'Loan not found' }, { status: 404 });
     }
 
+    // Get active cycle
+    const activeCycle = await prisma.cycle.findFirst({
+      where: { isActive: true },
+      orderBy: { startDate: 'desc' }
+    });
+    const effectiveCycleId = activeCycle?.id || 1;
+
     if (action === 'APPROVE') {
       const { netProceeds, interest } = calculateLoan(
         loan.principal,
@@ -49,7 +56,7 @@ export async function PATCH(
             memberId: loan.memberId,
             type: 'LOAN_DISBURSEMENT' as TransactionType,
             amount: netProceeds,
-            cycleId: 1, // Default cycle ID integer
+            cycleId: effectiveCycleId,
           },
         });
 
@@ -59,7 +66,7 @@ export async function PATCH(
             memberId: loan.memberId,
             type: 'INTEREST_EARNED' as TransactionType,
             amount: interest,
-            cycleId: 1, // Default cycle ID integer
+            cycleId: effectiveCycleId,
           },
         });
 
@@ -89,7 +96,7 @@ export async function PATCH(
             memberId: loan.memberId,
             type: 'LOAN_PAYMENT' as TransactionType,
             amount: parseFloat(amount),
-            cycleId: 1, // Default cycle ID integer
+            cycleId: effectiveCycleId,
           },
         });
 

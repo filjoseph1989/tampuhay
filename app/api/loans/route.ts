@@ -38,7 +38,7 @@ export async function POST(request: Request) {
 
     const loan = await prisma.loan.create({
       data: {
-        memberId,
+        memberId: parseInt(memberId),
         type: type || 'STANDARD',
         principal: parseFloat(principal),
         interestRate: parseFloat(interestRate || '5'),

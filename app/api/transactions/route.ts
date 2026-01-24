@@ -38,22 +38,32 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
     }
 
+    // Get active cycle if not provided
+    let effectiveCycleId = cycleId ? parseInt(cycleId) : null;
+    if (!effectiveCycleId) {
+      const activeCycle = await prisma.cycle.findFirst({
+        where: { isActive: true },
+        orderBy: { startDate: 'desc' }
+      });
+      effectiveCycleId = activeCycle?.id || 1;
+    }
+
     const transaction = await prisma.$transaction(async (tx) => {
       // 1. Create the transaction
       const newTx = await tx.transaction.create({
         data: {
-          memberId,
+          memberId: parseInt(memberId),
           amount: parseFloat(amount),
           type: type as TransactionType,
           date: date ? new Date(date) : new Date(),
-          cycleId: cycleId || 1, // Default cycle ID is integer 1
+          cycleId: effectiveCycleId,
         },
       });
 
       // 2. Update Member Savings if it's a CONTRIBUTION
       if (type === 'CONTRIBUTION') {
         await tx.user.update({
-          where: { id: memberId },
+          where: { id: parseInt(memberId) },
           data: {
             totalSaved: {
               increment: parseFloat(amount),
