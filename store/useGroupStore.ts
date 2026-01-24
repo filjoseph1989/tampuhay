@@ -139,11 +139,27 @@ export const useGroupStore = create<GroupStore>((set, get) => ({
   },
 
   convertToAutoLoan: async (memberId, amount) => {
-    console.log('convertToAutoLoan not implemented yet');
+    try {
+      const res = await fetch('/api/loans/convert', {
+        method: 'POST',
+        body: JSON.stringify({ memberId, amount }),
+      });
+      if (res.ok) await get().fetchData();
+    } catch (error) {
+      console.error('Error converting to auto-loan:', error);
+    }
   },
 
   rolloverLoan: async (loanId) => {
-    console.log('rolloverLoan not implemented yet');
+    try {
+      const res = await fetch('/api/loans/rollover', {
+        method: 'POST',
+        body: JSON.stringify({ loanId }),
+      });
+      if (res.ok) await get().fetchData();
+    } catch (error) {
+      console.error('Error rolling over loan:', error);
+    }
   },
 
   setShareValue: (value) => {
