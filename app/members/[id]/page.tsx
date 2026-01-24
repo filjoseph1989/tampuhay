@@ -28,13 +28,17 @@ export default function MemberDetailPage() {
     transactions.filter((t) => t.memberId === memberId), 
   [transactions, memberId]);
 
-  const memberLoans = useMemo(() => 
+  const activeLoansList = useMemo(() => 
     activeLoans.filter((l) => l.memberId === memberId && l.status === 'ACTIVE'), 
   [activeLoans, memberId]);
 
+  const allMemberLoans = useMemo(() => 
+    activeLoans.filter((l) => l.memberId === memberId),
+  [activeLoans, memberId]);
+
   const totalLoanBalance = useMemo(() => 
-    memberLoans.reduce((sum, l) => sum + (l.principal - l.amountPaid), 0), 
-  [memberLoans]);
+    activeLoansList.reduce((sum, l) => sum + (l.principal - l.amountPaid), 0), 
+  [activeLoansList]);
 
   const canEdit = session?.user?.id === memberId;
 
@@ -127,14 +131,59 @@ export default function MemberDetailPage() {
           <div>
             <p className="text-xs font-bold text-indigo-600 uppercase tracking-wider">Active Loan Balance</p>
             <p className="text-2xl font-black text-indigo-900">{formatMoney(totalLoanBalance)}</p>
-            {memberLoans.length > 0 && (
+            {activeLoansList.length > 0 && (
               <p className="text-[10px] text-indigo-400 mt-1 italic">
-                {memberLoans.length} active loan{memberLoans.length > 1 ? 's' : ''}
+                {activeLoansList.length} active loan{activeLoansList.length > 1 ? 's' : ''}
               </p>
             )}
           </div>
         </Card>
       </div>
+
+      {/* Loans Section */}
+      {allMemberLoans.length > 0 && (
+        <div className="space-y-3">
+          <div className="flex items-center gap-2 mb-1 ml-1">
+            <CreditCard size={18} className="text-gray-400" />
+            <h3 className="text-sm font-bold text-gray-700 uppercase tracking-tight">Loan Breakdown</h3>
+          </div>
+          <div className="space-y-3">
+            {allMemberLoans.map((loan) => {
+              const balance = loan.principal - loan.amountPaid;
+              const percentPaid = Math.round((loan.amountPaid / loan.principal) * 100);
+              return (
+                <Card key={loan.id} className="p-4 border-l-4 border-teal-500">
+                  <div className="flex justify-between items-start mb-2">
+                    <div>
+                      <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{loan.type.replace('_', ' ')}</p>
+                      <p className="text-lg font-black text-gray-900">{formatMoney(loan.principal)}</p>
+                    </div>
+                    <span className={`text-[10px] font-bold px-2 py-1 rounded uppercase ${
+                      loan.status === 'PAID' ? 'bg-green-100 text-green-700' : 
+                      loan.status === 'ACTIVE' ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-700'
+                    }`}>
+                      {loan.status}
+                    </span>
+                  </div>
+                  
+                  {loan.status === 'ACTIVE' && (
+                    <div className="space-y-2 mt-3">
+                      <div className="flex justify-between text-[10px] font-bold uppercase">
+                        <span className="text-gray-400">Balance: <span className="text-teal-600">{formatMoney(balance)}</span></span>
+                        <span className="text-gray-400">{percentPaid}% Paid</span>
+                      </div>
+                      <div className="w-full bg-gray-100 h-1.5 rounded-full overflow-hidden">
+                        <div className="bg-teal-500 h-full transition-all" style={{ width: `${percentPaid}%` }} />
+                      </div>
+                      <p className="text-[10px] text-gray-400">Due: {new Date(loan.dueDate).toLocaleDateString()}</p>
+                    </div>
+                  )}
+                </Card>
+              );
+            })}
+          </div>
+        </div>
+      )}
 
       {/* Transaction History */}
       <div>
