@@ -4,7 +4,7 @@ import { Button } from '../ui/Button';
 import { formatMoney } from '../../lib/currency';
 import CycleSettings from './CycleSettings';
 
-export default function CycleManagement() {
+export default function CycleManagement() { 
   const members = useGroupStore((state) => state.members);
   const transactions = useGroupStore((state) => state.transactions);
   const activeLoans = useGroupStore((state) => state.activeLoans);

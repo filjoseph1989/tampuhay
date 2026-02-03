@@ -45,29 +45,37 @@ export const useGroupStore = create<GroupStore>((set, get) => ({
         fetch('/api/cycles/active'),
       ]);
 
-      const members = await membersRes.json();
+      const membersData = await membersRes.json();
       const transactionsData = await txRes.json();
-      const activeLoans = await loansRes.json();
-      const activeCycle = await cycleRes.json();
-      const transactions = Array.isArray(transactionsData)
-        ? transactionsData
-        : [];
+      const activeLoansData = await loansRes.json();
+      const activeCycleData = await cycleRes.json();
+      
+      const members: Member[] = Array.isArray(membersData) ? membersData : [];
+      const transactions: Transaction[] = Array.isArray(transactionsData) ? transactionsData : [];
+      const activeLoans: Loan[] = Array.isArray(activeLoansData) ? activeLoansData : [];
+      const activeCycle = activeCycleData && activeCycleData.startDate ? activeCycleData : { 
+        startDate: new Date().toISOString(), 
+        targetPayoutDate: new Date().toISOString(), 
+        shareValue: 1000 
+      };
 
       // Calculate total pot from transactions
       let totalPot = 0;
-      transactions.forEach((t: Transaction) => {
-        switch (t.type) {
-          case 'CONTRIBUTION':
-          case 'FINE':
-          case 'LOAN_PAYMENT':
-            totalPot += t.amount;
-            break;
-          case 'LOAN_DISBURSEMENT':
-          case 'EXPENSE':
-            totalPot -= t.amount;
-            break;
+      if (Array.isArray(transactions)) {
+        for (const t of transactions) {
+          switch (t.type) {
+            case 'CONTRIBUTION':
+            case 'FINE':
+            case 'LOAN_PAYMENT':
+              totalPot += t.amount;
+              break;
+            case 'LOAN_DISBURSEMENT':
+            case 'EXPENSE':
+              totalPot -= t.amount;
+              break;
+          }
         }
-      });
+      }
 
       set({
         members,
