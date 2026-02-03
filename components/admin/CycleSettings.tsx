@@ -85,6 +85,11 @@ export default function CycleSettings() {
           Member Share Declarations (January)
         </h4>
         <div className="max-h-60 overflow-y-auto space-y-2 pr-1">
+          {members.length === 0 && (
+            <p className="text-sm text-gray-500 text-center py-4">
+              No members found (or loading...)
+            </p>
+          )}
           {members.map((member) => (
             <div key={member.id} className="flex items-center justify-between bg-gray-50 p-2 rounded border border-gray-100">
               <div>

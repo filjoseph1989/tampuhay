@@ -45,29 +45,37 @@ export const useGroupStore = create<GroupStore>((set, get) => ({
         fetch('/api/cycles/active'),
       ]);
 
-      const members = await membersRes.json();
+      const membersData = await membersRes.json();
       const transactionsData = await txRes.json();
-      const activeLoans = await loansRes.json();
-      const activeCycle = await cycleRes.json();
-      const transactions = Array.isArray(transactionsData)
-        ? transactionsData
-        : [];
+      const activeLoansData = await loansRes.json();
+      const activeCycleData = await cycleRes.json();
+      
+      const members: Member[] = Array.isArray(membersData) ? membersData : [];
+      const transactions: Transaction[] = Array.isArray(transactionsData) ? transactionsData : [];
+      const activeLoans: Loan[] = Array.isArray(activeLoansData) ? activeLoansData : [];
+      const activeCycle = activeCycleData && activeCycleData.startDate ? activeCycleData : { 
+        startDate: new Date().toISOString(), 
+        targetPayoutDate: new Date().toISOString(), 
+        shareValue: 1000 
+      };
 
       // Calculate total pot from transactions
       let totalPot = 0;
-      transactions.forEach((t: Transaction) => {
-        switch (t.type) {
-          case 'CONTRIBUTION':
-          case 'FINE':
-          case 'LOAN_PAYMENT':
-            totalPot += t.amount;
-            break;
-          case 'LOAN_DISBURSEMENT':
-          case 'EXPENSE':
-            totalPot -= t.amount;
-            break;
+      if (Array.isArray(transactions)) {
+        for (const t of transactions) {
+          switch (t.type) {
+            case 'CONTRIBUTION':
+            case 'FINE':
+            case 'LOAN_PAYMENT':
+              totalPot += t.amount;
+              break;
+            case 'LOAN_DISBURSEMENT':
+            case 'EXPENSE':
+              totalPot -= t.amount;
+              break;
+          }
         }
-      });
+      }
 
       set({
         members,
@@ -91,13 +99,15 @@ export const useGroupStore = create<GroupStore>((set, get) => ({
     try {
       const res = await fetch(`/api/loans/${loanId}`, {
         method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ action: 'APPROVE' }),
       });
       if (res.ok) {
         await get().fetchData();
         toast.success('Loan approved successfully');
       } else {
-        toast.error('Failed to approve loan');
+        const errorData = await res.json().catch(() => ({}));
+        toast.error(errorData.error || 'Failed to approve loan');
       }
     } catch (error) {
       console.error('Error approving loan:', error);
@@ -109,13 +119,15 @@ export const useGroupStore = create<GroupStore>((set, get) => ({
     try {
       const res = await fetch(`/api/loans/${loanId}`, {
         method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ action: 'REJECT' }),
       });
       if (res.ok) {
         await get().fetchData();
         toast.success('Loan rejected');
       } else {
-        toast.error('Failed to reject loan');
+        const errorData = await res.json().catch(() => ({}));
+        toast.error(errorData.error || 'Failed to reject loan');
       }
     } catch (error) {
       console.error('Error rejecting loan:', error);
@@ -127,13 +139,15 @@ export const useGroupStore = create<GroupStore>((set, get) => ({
     try {
       const res = await fetch('/api/transactions', {
         method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(newTx),
       });
       if (res.ok) {
         await get().fetchData();
         toast.success('Transaction recorded');
       } else {
-        toast.error('Failed to add transaction');
+        const errorData = await res.json().catch(() => ({}));
+        toast.error(errorData.error || 'Failed to add transaction');
       }
     } catch (error) {
       console.error('Error adding transaction:', error);
@@ -145,13 +159,15 @@ export const useGroupStore = create<GroupStore>((set, get) => ({
     try {
       const res = await fetch('/api/loans', {
         method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(newLoan),
       });
       if (res.ok) {
         await get().fetchData();
         toast.success('Loan requested successfully');
       } else {
-        toast.error('Failed to request loan');
+        const errorData = await res.json().catch(() => ({}));
+        toast.error(errorData.error || 'Failed to request loan');
       }
     } catch (error) {
       console.error('Error requesting loan:', error);
@@ -163,13 +179,15 @@ export const useGroupStore = create<GroupStore>((set, get) => ({
     try {
       const res = await fetch(`/api/loans/${loanId}`, {
         method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ action: 'REPAY', amount }),
       });
       if (res.ok) {
         await get().fetchData();
         toast.success('Payment recorded');
       } else {
-        toast.error('Failed to record payment');
+        const errorData = await res.json().catch(() => ({}));
+        toast.error(errorData.error || 'Failed to record payment');
       }
     } catch (error) {
       console.error('Error repaying loan:', error);
@@ -181,13 +199,15 @@ export const useGroupStore = create<GroupStore>((set, get) => ({
     try {
       const res = await fetch('/api/loans/convert', {
         method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ memberId, amount }),
       });
       if (res.ok) {
         await get().fetchData();
         toast.success('Converted to Auto-Loan');
       } else {
-        toast.error('Failed to convert');
+        const errorData = await res.json().catch(() => ({}));
+        toast.error(errorData.error || 'Failed to convert');
       }
     } catch (error) {
       console.error('Error converting to auto-loan:', error);
@@ -199,13 +219,15 @@ export const useGroupStore = create<GroupStore>((set, get) => ({
     try {
       const res = await fetch('/api/loans/rollover', {
         method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ loanId }),
       });
       if (res.ok) {
         await get().fetchData();
         toast.success('Loan Rollover successful');
       } else {
-        toast.error('Failed to rollover loan');
+        const errorData = await res.json().catch(() => ({}));
+        toast.error(errorData.error || 'Failed to rollover loan');
       }
     } catch (error) {
       console.error('Error rolling over loan:', error);
@@ -217,13 +239,15 @@ export const useGroupStore = create<GroupStore>((set, get) => ({
     try {
       const res = await fetch('/api/cycles/active', {
         method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ shareValue: value }),
       });
       if (res.ok) {
         await get().fetchData();
         toast.success('Share value updated');
       } else {
-        toast.error('Failed to update share value');
+        const errorData = await res.json().catch(() => ({}));
+        toast.error(errorData.error || 'Failed to update share value');
       }
     } catch (error) {
       console.error('Error updating share value:', error);
@@ -235,13 +259,15 @@ export const useGroupStore = create<GroupStore>((set, get) => ({
     try {
       const res = await fetch(`/api/members/${memberId}`, {
         method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ numberOfShares: shares }),
       });
       if (res.ok) {
         await get().fetchData();
         toast.success('Member shares updated');
       } else {
-        toast.error('Failed to update shares');
+        const errorData = await res.json().catch(() => ({}));
+        toast.error(errorData.error || 'Failed to update shares');
       }
     } catch (error) {
       console.error('Error updating shares:', error);

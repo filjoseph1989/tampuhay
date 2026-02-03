@@ -12,7 +12,8 @@ export default function LoanCalculator() {
   const [borrower, setBorrower] = useState<string>('');
   const [showForm, setShowForm] = useState<boolean>(false);
   const [success, setSuccess] = useState<boolean>(false);
-  const members = useGroupStore((state) => state.members);
+  const membersData = useGroupStore((state) => state.members);
+  const members = Array.isArray(membersData) ? membersData : [];
   const totalPot = useGroupStore((state) => state.groupState.totalPot);
   const INTEREST_RATE = 5; // 5% Interest
 
