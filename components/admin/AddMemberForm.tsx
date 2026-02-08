@@ -24,13 +24,15 @@ export default function AddMemberForm({ addMember }: AddMemberFormProps) {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!formData.name) return;
+    if (!formData.email) return;
 
     setIsSubmitting(true);
+
     try {
       await addMember({
         name: formData.name,
-        email: formData.email || undefined,
-        role: formData.role,
+        email: formData.email,
+        role: formData.role || 'MEMBER',
         numberOfShares: parseInt(formData.numberOfShares) || 0,
       });
 
@@ -87,12 +89,11 @@ export default function AddMemberForm({ addMember }: AddMemberFormProps) {
           min="1"
         />
 
-        <Button 
-          type="submit" 
-          fullWidth 
+        <Button
+          type="submit"
+          fullWidth
           className="mt-4 cursor-pointer"
-          disabled={isSubmitting}
-        >
+          disabled={isSubmitting}>
           {isSubmitting ? 'Adding Member...' : 'Add Member'}
         </Button>
       </form>

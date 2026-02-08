@@ -24,6 +24,7 @@ export async function GET() {
 
 export async function POST(request: Request) {
   const session = await getServerSession(authOptions);
+
   if (!session || session.user.role !== 'TREASURER') {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
@@ -51,7 +52,7 @@ export async function POST(request: Request) {
         name,
         email: email || null,
         role: role || 'MEMBER',
-        numberOfShares: parseInt(numberOfShares) || 0,
+        numberOfShares: parseInt(numberOfShares.toString()) || 0,
         totalSaved: 0,
       },
     });
