@@ -33,7 +33,7 @@ export function MobileShell({ children, groupName }: MobileShellProps) {
       <TopBar
         groupName={groupName} />
 
-      <main className="px-4 max-w-md mx-auto w-full">
+      <main className="px-4 max-w-md lg:max-w-4xl xl:max-w-6xl mx-auto w-full">
         {children}
       </main>
 
