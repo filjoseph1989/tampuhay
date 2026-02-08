@@ -30,7 +30,7 @@ export default function AdminPage() {
         <CycleManagement />
       </CollapsibleSection>
 
-      <CollapsibleSection title="Loan Requests" defaultExpanded={true}>
+      <CollapsibleSection title="Loan Requests" defaultExpanded={false}>
         <LoanApprovalDashboard />
       </CollapsibleSection>
 
