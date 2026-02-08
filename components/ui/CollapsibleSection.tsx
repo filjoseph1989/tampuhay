@@ -6,20 +6,27 @@ interface CollapsibleSectionProps {
   children: React.ReactNode;
   defaultExpanded?: boolean;
   className?: string;
+  isExpanded?: boolean;
+  onToggle?: () => void;
 }
 
 export function CollapsibleSection({
   title,
   children,
   defaultExpanded = false,
-  className = ''
+  className = '',
+  isExpanded: controlledIsExpanded,
+  onToggle
 }: CollapsibleSectionProps) {
-  const [isExpanded, setIsExpanded] = useState(defaultExpanded);
+  const [internalIsExpanded, setInternalIsExpanded] = useState(defaultExpanded);
+
+  const isExpanded = controlledIsExpanded !== undefined ? controlledIsExpanded : internalIsExpanded;
+  const toggle = onToggle || (() => setInternalIsExpanded(!internalIsExpanded));
 
   return (
     <Card className={`transition-all duration-300 ${className}`} padding={false}>
       <button
-        onClick={() => setIsExpanded(!isExpanded)}
+        onClick={toggle}
         className="w-full flex items-center justify-between p-4 bg-gray-50 hover:bg-gray-100 transition-colors text-left">
         <h4 className="text-sm font-bold text-gray-700 uppercase tracking-wider">
           {title}
