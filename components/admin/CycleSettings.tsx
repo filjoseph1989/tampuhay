@@ -84,7 +84,7 @@ export default function CycleSettings() {
         <h4 className="text-sm font-bold text-gray-700 uppercase tracking-wider border-b pb-1">
           Member Share Declarations (January)
         </h4>
-        <div className="max-h-60 overflow-y-auto space-y-2 pr-1">
+        <div className="space-y-2 pr-1">
           {members.length === 0 && (
             <p className="text-sm text-gray-500 text-center py-4">
               No members found (or loading...)
