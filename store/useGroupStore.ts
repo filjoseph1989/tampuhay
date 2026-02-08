@@ -46,10 +46,26 @@ export const useGroupStore = create<GroupStore>((set, get) => ({
         fetch('/api/cycles/active'),
       ]);
 
-      const membersData = await membersRes.json();
-      const transactionsData = await txRes.json();
-      const activeLoansData = await loansRes.json();
-      const activeCycleData = await cycleRes.json();
+      // Check if any response is not OK or not JSON
+      const checkResponse = async (res: Response, name: string) => {
+        const contentType = res.headers.get('content-type');
+        if (!res.ok || !contentType?.includes('application/json')) {
+          const text = await res.text();
+          console.error(`Fetch error for ${name}:`, {
+            status: res.status,
+            statusText: res.statusText,
+            contentType,
+            bodySnippet: text.substring(0, 200)
+          });
+          throw new Error(`Failed to fetch ${name}: ${res.status} ${res.statusText}`);
+        }
+        return res.json();
+      };
+
+      const membersData = await checkResponse(membersRes, 'members');
+      const transactionsData = await checkResponse(txRes, 'transactions');
+      const activeLoansData = await checkResponse(loansRes, 'loans');
+      const activeCycleData = await checkResponse(cycleRes, 'cycle');
 
       const members: Member[] = Array.isArray(membersData) ? membersData : [];
       const transactions: Transaction[] = Array.isArray(transactionsData) ? transactionsData : [];

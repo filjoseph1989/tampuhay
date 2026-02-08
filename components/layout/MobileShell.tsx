@@ -5,6 +5,8 @@ import { TopBar } from './TopBar';
 import { BottomNav } from './BottomNav';
 import { useGroupStore } from '@/store/useGroupStore';
 
+import { useSession } from 'next-auth/react';
+
 interface MobileShellProps {
   children: React.ReactNode;
   userName?: string;
@@ -13,10 +15,13 @@ interface MobileShellProps {
 
 export function MobileShell({ children, groupName }: MobileShellProps) {
   const fetchData = useGroupStore((state) => state.fetchData);
+  const { status } = useSession();
 
   useEffect(() => {
-    fetchData();
-  }, [fetchData]);
+    if (status === 'authenticated') {
+      fetchData();
+    }
+  }, [fetchData, status]);
 
   return (
     <div className="min-h-screen bg-gray-50 pb-20 pt-16 font-sans">
