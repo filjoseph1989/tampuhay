@@ -9,6 +9,14 @@ export default withAuth(
     ) {
       return NextResponse.rewrite(new URL("/login", req.url));
     }
+
+    if (
+      req.nextUrl.pathname.startsWith("/report") &&
+      req.nextauth.token?.role !== "TREASURER" &&
+      req.nextauth.token?.role !== "KABERK"
+    ) {
+      return NextResponse.rewrite(new URL("/login", req.url));
+    }
   },
   {
     callbacks: {
@@ -17,4 +25,4 @@ export default withAuth(
   }
 );
 
-export const config = { matcher: ["/admin/:path*", "/ledger/:path*", "/members/:path*"] };
+export const config = { matcher: ["/admin/:path*", "/ledger/:path*", "/members/:path*", "/report/:path*"] };
