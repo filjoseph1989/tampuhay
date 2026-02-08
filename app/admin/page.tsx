@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import { useGroupStore } from '../../store/useGroupStore';
 import { CollapsibleSection } from '../../components/ui/CollapsibleSection';
 import CycleManagement from '../../components/admin/CycleManagement';
@@ -12,6 +13,11 @@ import AdminStats from '../../components/admin/AdminStats';
 
 export default function AdminPage() {
   const { members, addTransaction, transactions, addMember } = useGroupStore();
+  const [activeSection, setActiveSection] = useState<string | null>(null);
+
+  const toggleSection = (section: string) => {
+    setActiveSection(activeSection === section ? null : section);
+  };
 
   return (
     <div className="pt-2 space-y-6 pb-20">
@@ -22,29 +28,47 @@ export default function AdminPage() {
 
       <AdminStats />
 
-      <CollapsibleSection title="Member Management" defaultExpanded={false}>
+      <CollapsibleSection
+        title="Member Management"
+        isExpanded={activeSection === 'members'}
+        onToggle={() => toggleSection('members')}>
         <AddMemberForm addMember={addMember} />
       </CollapsibleSection>
 
-      <CollapsibleSection title="Cycle Management" defaultExpanded={false}>
+      <CollapsibleSection
+        title="Cycle Management"
+        isExpanded={activeSection === 'cycle'}
+        onToggle={() => toggleSection('cycle')}>
         <CycleManagement />
       </CollapsibleSection>
 
-      <CollapsibleSection title="Loan Requests" defaultExpanded={false}>
+      <CollapsibleSection
+        title="Loan Requests"
+        isExpanded={activeSection === 'requests'}
+        onToggle={() => toggleSection('requests')}>
         <LoanApprovalDashboard />
       </CollapsibleSection>
 
-      <CollapsibleSection title="Active Loans" defaultExpanded={false}>
+      <CollapsibleSection
+        title="Active Loans"
+        isExpanded={activeSection === 'active'}
+        onToggle={() => toggleSection('active')}>
         <ActiveLoansManager />
       </CollapsibleSection>
 
-      <CollapsibleSection title="Record Transaction" defaultExpanded={false}>
+      <CollapsibleSection
+        title="Record Transaction"
+        isExpanded={activeSection === 'transaction'}
+        onToggle={() => toggleSection('transaction')}>
         <AddTransactionForm
           members={members}
           addTransaction={addTransaction} />
       </CollapsibleSection>
 
-      <CollapsibleSection title="Recent Activity" defaultExpanded={false}>
+      <CollapsibleSection
+        title="Recent Activity"
+        isExpanded={activeSection === 'activity'}
+        onToggle={() => toggleSection('activity')}>
         <TransactionFeed
           transactions={transactions}
           members={members} />
