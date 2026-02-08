@@ -20,6 +20,7 @@ interface GroupStore {
   rolloverLoan: (loanId: number) => Promise<void>;
   setShareValue: (value: number) => Promise<void>;
   updateMemberShares: (memberId: number, shares: number) => Promise<void>;
+  addMember: (memberData: { name: string; email?: string; role: string; numberOfShares: number }) => Promise<void>;
 }
 
 export const useGroupStore = create<GroupStore>((set, get) => ({
@@ -271,6 +272,26 @@ export const useGroupStore = create<GroupStore>((set, get) => ({
       }
     } catch (error) {
       console.error('Error updating shares:', error);
+      toast.error('An error occurred');
+    }
+  },
+
+  addMember: async (memberData) => {
+    try {
+      const res = await fetch('/api/members', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(memberData),
+      });
+      if (res.ok) {
+        await get().fetchData();
+        toast.success('Member added successfully');
+      } else {
+        const errorData = await res.json().catch(() => ({}));
+        toast.error(errorData.error || 'Failed to add member');
+      }
+    } catch (error) {
+      console.error('Error adding member:', error);
       toast.error('An error occurred');
     }
   }
