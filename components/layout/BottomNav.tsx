@@ -3,7 +3,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Home, BookOpen, PlusCircle } from 'lucide-react';
+import { Home, BookOpen, PlusCircle, PieChart } from 'lucide-react';
 import { useSession } from 'next-auth/react';
 
 export function BottomNav() {
@@ -13,6 +13,9 @@ export function BottomNav() {
   const isActive = (path: string) => {
     return pathname === path ? 'text-teal-600' : 'text-gray-500 hover:text-teal-500';
   };
+
+  const isTreasurer = session?.user?.role === 'TREASURER';
+  const canViewReports = isTreasurer || session?.user?.role === 'KABERK';
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-gray-200 h-16 pb-safe">
@@ -27,7 +30,14 @@ export function BottomNav() {
           <span className="text-[10px] font-medium uppercase">Ledger</span>
         </Link>
 
-        {session?.user?.role === 'TREASURER' && (
+        {canViewReports && (
+          <Link href="/report" className={`flex flex-col items-center justify-center w-full h-full space-y-1 ${isActive('/report')}`}>
+            <PieChart size={24} />
+            <span className="text-[10px] font-medium uppercase">Report</span>
+          </Link>
+        )}
+
+        {isTreasurer && (
           <Link href="/admin" className={`flex flex-col items-center justify-center w-full h-full space-y-1 ${isActive('/admin')}`}>
             <PlusCircle size={24} />
             <span className="text-[10px] font-medium uppercase">Admin</span>

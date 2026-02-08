@@ -9,7 +9,10 @@ export default function AdminStats() {
   const stats = useMemo(() => {
     // 1. Outstanding Loans
     const activeLoansList = activeLoans.filter(l => l.status === 'ACTIVE');
-    const outstanding = activeLoansList.reduce((sum, l) => sum + l.principal, 0);
+    const outstanding = activeLoansList.reduce((sum, l) => {
+      const interest = l.principal * (l.interestRate / 100);
+      return sum + (l.principal + interest - l.amountPaid);
+    }, 0);
     const activeCount = activeLoansList.length;
 
     // 2. Collection Progress
@@ -17,9 +20,9 @@ export default function AdminStats() {
     const actualCollection = transactions
       .filter(t => t.type === 'CONTRIBUTION')
       .reduce((sum, t) => sum + t.amount, 0);
-    
-    const collectionRate = targetCollection > 0 
-      ? Math.round((actualCollection / targetCollection) * 100) 
+
+    const collectionRate = targetCollection > 0
+      ? Math.round((actualCollection / targetCollection) * 100)
       : 0;
 
     // 3. Pending Requests
@@ -66,9 +69,9 @@ export default function AdminStats() {
           </div>
         </div>
         <div className="mt-2 h-1 w-full bg-orange-200 rounded-full overflow-hidden">
-          <div 
-            className="h-full bg-orange-500 transition-all duration-500" 
-            style={{ width: `${Math.min(stats.collectionRate, 100)}%` }} 
+          <div
+            className="h-full bg-orange-500 transition-all duration-500"
+            style={{ width: `${Math.min(stats.collectionRate, 100)}%` }}
           />
         </div>
       </Card>
