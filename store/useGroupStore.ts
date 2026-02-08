@@ -20,6 +20,7 @@ interface GroupStore {
   rolloverLoan: (loanId: number) => Promise<void>;
   setShareValue: (value: number) => Promise<void>;
   updateMemberShares: (memberId: number, shares: number) => Promise<void>;
+  addMember: (memberData: { name: string; email?: string; role: string; numberOfShares: number }) => Promise<void>;
 }
 
 export const useGroupStore = create<GroupStore>((set, get) => ({
@@ -49,14 +50,14 @@ export const useGroupStore = create<GroupStore>((set, get) => ({
       const transactionsData = await txRes.json();
       const activeLoansData = await loansRes.json();
       const activeCycleData = await cycleRes.json();
-      
+
       const members: Member[] = Array.isArray(membersData) ? membersData : [];
       const transactions: Transaction[] = Array.isArray(transactionsData) ? transactionsData : [];
       const activeLoans: Loan[] = Array.isArray(activeLoansData) ? activeLoansData : [];
-      const activeCycle = activeCycleData && activeCycleData.startDate ? activeCycleData : { 
-        startDate: new Date().toISOString(), 
-        targetPayoutDate: new Date().toISOString(), 
-        shareValue: 1000 
+      const activeCycle = activeCycleData && activeCycleData.startDate ? activeCycleData : {
+        startDate: new Date().toISOString(),
+        targetPayoutDate: new Date().toISOString(),
+        shareValue: 1000
       };
 
       // Calculate total pot from transactions
@@ -271,6 +272,35 @@ export const useGroupStore = create<GroupStore>((set, get) => ({
       }
     } catch (error) {
       console.error('Error updating shares:', error);
+      toast.error('An error occurred');
+    }
+  },
+
+  /**
+   * Adds a new member to the group.
+   *
+   * @param memberData - The data for the new member.
+   * @param memberData.name - The name of the member.
+   * @param memberData.email - The email address of the member (optional).
+   * @param memberData.role - The role assigned to the member.
+   * @param memberData.numberOfShares - The number of shares the member holds.
+   */
+  addMember: async (memberData) => {
+    try {
+      const res = await fetch('/api/members', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(memberData),
+      });
+      if (res.ok) {
+        await get().fetchData();
+        toast.success('Member added successfully');
+      } else {
+        const errorData = await res.json().catch(() => ({}));
+        toast.error(errorData.error || 'Failed to add member');
+      }
+    } catch (error) {
+      console.error('Error adding member:', error);
       toast.error('An error occurred');
     }
   }

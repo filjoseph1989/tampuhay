@@ -22,17 +22,15 @@ async function main() {
 
   // 2. Create Mock Members
   const mockMembers = [
-    { id: 1, name: 'treasurer', email: 'treasurer@example.com', role: Role.TREASURER },
-    { id: 2, name: 'ailene', email: 'ailene@example.com', role: Role.KABERK },
-    { id: 3, name: 'bernard', email: 'bernard@example.com', role: Role.KABERK },
-    { id: 4, name: 'charlotte', email: 'charlotte@example.com', role: Role.KABERK },
-    { id: 5, name: 'connie', email: 'connie@example.com', role: Role.KABERK },
-    { id: 6, name: 'fil', email: 'fil@example.com', role: Role.KABERK },
-    { id: 7, name: 'leslie', email: 'leslie@example.com', role: Role.KABERK },
-    { id: 8, name: 'rejean', email: 'rejean@example.com', role: Role.KABERK },
-    { id: 9, name: 'rodelyn', email: 'rodelyn@example.com', role: Role.KABERK },
-    { id: 10, name: 'romel', email: 'romel@example.com', role: Role.KABERK },
-    { id: 11, name: 'ronald', email: 'ronald@example.com', role: Role.MEMBER },
+    { name: 'treasurer', email: 'treasurer@example.com', role: Role.TREASURER },
+    { name: 'ailene', email: 'ailene@example.com', role: Role.KABERK },
+    { name: 'charlotte', email: 'charlotte@example.com', role: Role.KABERK },
+    { name: 'connie', email: 'connie@example.com', role: Role.KABERK },
+    { name: 'fil', email: 'fil@example.com', role: Role.KABERK },
+    { name: 'leslie', email: 'leslie@example.com', role: Role.KABERK },
+    { name: 'rodelyn', email: 'rodelyn@example.com', role: Role.KABERK },
+    { name: 'romel', email: 'romel@example.com', role: Role.KABERK },
+    { name: 'ronald', email: 'ronald@example.com', role: Role.MEMBER },
   ]
 
   for (const member of mockMembers) {
@@ -42,13 +40,14 @@ async function main() {
         name: member.name,
         role: member.role,
         password,
+        isActive: true,
       },
       create: {
-        id: member.id,
         name: member.name,
         email: member.email,
         role: member.role,
         password,
+        isActive: true,
         totalSaved: 0,
         numberOfShares: 0,
       },

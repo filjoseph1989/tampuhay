@@ -1,3 +1,5 @@
+'use client';
+
 import { useGroupStore } from '../../store/useGroupStore';
 import { Card } from '../ui/Card';
 import { Button } from '../ui/Button';
