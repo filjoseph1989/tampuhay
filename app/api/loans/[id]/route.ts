@@ -18,7 +18,7 @@ export async function PATCH(
     const { id } = await params;
     const loanId = parseInt(id);
     const body = await request.json();
-    const { action, amount } = body;
+    const { action, amount, date } = body;
 
     const loan = await prisma.loan.findUnique({
       where: { id: loanId },
@@ -92,6 +92,7 @@ export async function PATCH(
             memberId: loan.memberId,
             type: 'LOAN_PAYMENT' as TransactionType,
             amount: parseFloat(amount),
+            date: date ? new Date(date) : new Date(),
             cycleId: effectiveCycleId,
           },
         });

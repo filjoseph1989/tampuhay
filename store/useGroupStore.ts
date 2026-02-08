@@ -15,7 +15,7 @@ interface GroupStore {
   rejectLoan: (loanId: number) => Promise<void>;
   addTransaction: (transaction: Omit<Transaction, 'id'>) => Promise<void>;
   requestLoan: (loan: Omit<Loan, 'id'|'status'|'amountPaid'>) => Promise<void>;
-  repayLoan: (loanId: number, amount: number) => Promise<void>;
+  repayLoan: (loanId: number, amount: number, date?: string) => Promise<void>;
   convertToAutoLoan: (memberId: number, amount: number) => Promise<void>;
   rolloverLoan: (loanId: number) => Promise<void>;
   setShareValue: (value: number) => Promise<void>;
@@ -153,6 +153,16 @@ export const useGroupStore = create<GroupStore>((set, get) => ({
   },
 
   addTransaction: async (newTx) => {
+    // If it's a LOAN_PAYMENT, automatically find the active loan and use repayLoan flow
+    if (newTx.type === 'LOAN_PAYMENT') {
+      const activeLoan = get().activeLoans.find(
+        (l) => l.memberId === newTx.memberId && l.status === 'ACTIVE'
+      );
+      if (activeLoan) {
+        return get().repayLoan(activeLoan.id, newTx.amount, newTx.date);
+      }
+    }
+
     try {
       const res = await fetch('/api/transactions', {
         method: 'POST',
@@ -192,12 +202,12 @@ export const useGroupStore = create<GroupStore>((set, get) => ({
     }
   },
 
-  repayLoan: async (loanId, amount) => {
+  repayLoan: async (loanId, amount, date) => {
     try {
       const res = await fetch(`/api/loans/${loanId}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'REPAY', amount }),
+        body: JSON.stringify({ action: 'REPAY', amount, date }),
       });
       if (res.ok) {
         await get().fetchData();
