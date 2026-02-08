@@ -1,7 +1,6 @@
-import { PrismaClient, Role } from '@prisma/client'
+import { Role } from '@prisma/client'
 import { hash } from 'bcryptjs'
-
-const prisma = new PrismaClient()
+import prisma from '../lib/prisma'
 
 async function main() {
   console.log('🌱 Seeding database...')
