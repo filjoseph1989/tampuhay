@@ -54,7 +54,7 @@ export default function LoanApplicationForm({
 
   if (!member) {
     return (
-      <Card className="max-w-md mx-auto p-6">
+      <Card className="p-6">
         <p className="text-red-500">Please select a valid member in the calculator first.</p>
         <Button
           variant="secondary"
@@ -67,7 +67,7 @@ export default function LoanApplicationForm({
   }
 
   return (
-    <Card className="max-w-md mx-auto">
+    <Card>
       <form onSubmit={handleSubmit} className="space-y-6">
         <div>
           <h2 className="text-xl font-bold text-gray-800">Confirm Loan Request</h2>
