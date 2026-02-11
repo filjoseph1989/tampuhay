@@ -25,7 +25,7 @@ export function TopBar({ groupName = 'Tampuhay Group' }: TopBarProps) {
   };
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-teal-600 text-white shadow-md h-14 flex items-center justify-between px-4">
+    <header className="bg-teal-600 text-white shadow-md h-14 flex items-center justify-between px-4 w-full">
       <Link href="/" className="font-bold text-lg tracking-tight truncate max-w-[60%]">
         {groupName}
       </Link>
