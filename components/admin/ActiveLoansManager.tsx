@@ -28,7 +28,9 @@ export default function ActiveLoansManager() {
 
     const member = members.find((m) => m.id === loan.memberId);
     const role = member?.role || 'MEMBER';
-    const effectiveRate = (role === 'KABERK' || role === 'TREASURER') ? loan.interestRate : 10;
+    const effectiveRate = (role === 'KABERK' || role === 'TREASURER')
+      ? loan.interestRate
+      : 10; // Todo: kaning 10 diri dapat dili ni hardcoded
     const interest = loan.principal * (effectiveRate / 100);
     const totalOwed = loan.principal + interest;
     const balance = totalOwed - loan.amountPaid;
@@ -59,12 +61,12 @@ export default function ActiveLoansManager() {
         const member = members.find((m) => m.id === loan.memberId);
         const memberName = member?.name || 'Unknown';
         const role = member?.role || 'MEMBER';
-        
+
         const effectiveRate = (role === 'KABERK' || role === 'TREASURER') ? loan.interestRate : 10;
         const interest = loan.principal * (effectiveRate / 100);
         const totalOwed = loan.principal + interest;
         const balance = totalOwed - loan.amountPaid;
-        
+
         const isPastDue = new Date(loan.dueDate) < new Date();
 
         return (
