@@ -24,7 +24,7 @@ export default function LoanCalculator() {
 
   if (success) {
     return (
-      <Card className="max-w-md mx-auto text-center py-10 space-y-4">
+      <Card className="text-center py-10 space-y-4">
         <div className="bg-green-100 text-green-600 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
           <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
@@ -56,7 +56,7 @@ export default function LoanCalculator() {
   }
 
   return (
-    <Card className="max-w-md mx-auto">
+    <Card>
       <div className="space-y-6">
         <div>
           <h2 className="text-xl font-bold text-gray-800">Loan Calculator</h2>

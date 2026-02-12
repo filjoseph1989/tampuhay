@@ -18,8 +18,8 @@ export function BottomNav() {
   const canViewReports = isTreasurer || session?.user?.role === 'KABERK';
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-gray-200 h-16 pb-safe">
-      <div className="flex justify-around items-center h-full">
+    <nav className="bg-white border-t border-gray-200 h-16 pb-safe w-full flex items-center justify-center">
+      <div className="max-w-md md:max-w-4xl mx-auto w-full flex justify-around items-center h-full">
         <Link href="/" className={`flex flex-col items-center justify-center w-full h-full space-y-1 ${isActive('/')}`}>
           <Home size={24} />
           <span className="text-[10px] font-medium uppercase">Home</span>

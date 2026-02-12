@@ -30,14 +30,21 @@ export function MobileShell({ children, groupName }: MobileShellProps) {
         pb-20: Padding Bottom to account for fixed BottomNav (h-16 + gap)
       */}
 
-      <TopBar
-        groupName={groupName} />
+      <div className="fixed top-0 left-0 right-0 z-50 flex justify-center pointer-events-none">
+        <div className="w-full pointer-events-auto">
+          <TopBar groupName={groupName} />
+        </div>
+      </div>
 
-      <main className="px-4 max-w-md lg:max-w-4xl xl:max-w-6xl mx-auto w-full">
+      <main className="px-4 max-w-md md:max-w-4xl mx-auto w-full">
         {children}
       </main>
 
-      <BottomNav />
+      <div className="fixed bottom-0 left-0 right-0 z-50 flex justify-center pointer-events-none">
+        <div className="w-full pointer-events-auto">
+          <BottomNav />
+        </div>
+      </div>
     </div>
   );
 }
