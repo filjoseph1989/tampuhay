@@ -20,6 +20,13 @@ You can start editing the page by modifying `app/page.tsx`. The page auto-update
 
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
+## Default Credentials
+
+To log in as a **Treasurer** (Admin):
+- **Email:** `treasurer@example.com`
+- **Password:** `password123`
+
+
 ## Learn More
 
 To learn more about Next.js, take a look at the following resources:
@@ -34,3 +41,14 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+
+## Database Backup
+
+To create a backup of your local PostgreSQL database (`tampuhay_db`), you can use the `pg_dump` utility. Run the following command in your terminal:
+
+```bash
+pg_dump $DATABASE_URL > tampuhay_db_backup.sql
+pg_dump "postgresql://fil:@localhost:5432/tampuhay_db" > tampuhay_db_backup_$(date +%Y%m%d_%H%M%S).sql
+# Or manually specifying the connection details:
+# pg_dump -U <username> -h localhost -p 5432 tampuhay_db > tampuhay_db_backup.sql
+```
