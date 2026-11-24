@@ -22,6 +22,10 @@ export default function AddTransactionForm({ members, addTransaction }: AddTrans
     date: new Date().toISOString().split('T')[0], // Default to YYYY-MM-DD
   });
 
+  /**
+   * Todo: scenario, si ailene naa utanga nga 2k, pero ni bayad siya og 3k, unya contribution ang gi pili,
+   * dapat ang mahitabo, ma add ang 3k sa iyang shares, pero naa gihapun utang
+   */
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!formData.memberId || !formData.amount) return;
