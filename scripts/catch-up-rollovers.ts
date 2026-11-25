@@ -1,28 +1,24 @@
 import 'dotenv/config';
 import { LoanType, TransactionType } from '@prisma/client';
 import prisma from '../lib/prisma';
+import { nextDueDate } from '../lib/dueDate';
+import { monthlyInterest, interestBase } from '../lib/interest';
 
 /**
  * Catch-up rollover for past-due loans.
  *
- * Unlike rollover-past-due.ts (which sets the new due date to "1 month from now"),
- * this rolls each loan over once per missed month, anchored on the loan's own
- * due date, and backdates the records to that due date. Run it any time; it
+ * Rolls each loan over once per missed month-end (+simple interest on the original
+ * amount, see lib/interest.ts), moving the due
+ * date to the end of the following month, and backdates the records to the
+ * due date it rolled on. Run it any time; it
  * only touches ACTIVE loans whose dueDate has passed.
  *
  *   npx tsx scripts/catch-up-rollovers.ts          # dry run (no changes)
  *   npx tsx scripts/catch-up-rollovers.ts --apply  # write to the database
  */
 
-const PENALTY_RATE = 0.05;
 const apply = process.argv.includes('--apply');
 const peso = (n: number) => `₱${n.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-
-function addMonth(d: Date) {
-  const next = new Date(d);
-  next.setMonth(next.getMonth() + 1);
-  return next;
-}
 
 async function main() {
   const now = new Date();
@@ -43,14 +39,15 @@ async function main() {
   }
 
   for (const loan of loans) {
-    let current = { id: loan.id, principal: loan.principal, dueDate: loan.dueDate };
+    const base = interestBase(loan);
+    let current = { id: loan.id, type: loan.type as string, principal: loan.principal, basePrincipal: base, interestRate: loan.interestRate, dueDate: loan.dueDate };
     console.log(`👤 ${loan.member.name} — loan #${loan.id}, ${peso(loan.principal)}, due ${loan.dueDate.toISOString().slice(0, 10)}`);
 
     while (current.dueDate < now) {
       const rolledAt = current.dueDate;
-      const penalty = current.principal * PENALTY_RATE;
+      const penalty = monthlyInterest(current);
       const newPrincipal = current.principal + penalty;
-      const newDueDate = addMonth(rolledAt);
+      const newDueDate = nextDueDate(rolledAt);
 
       let newId = -1;
       if (apply) {
@@ -61,6 +58,7 @@ async function main() {
               memberId: loan.memberId,
               type: 'STANDARD' as LoanType,
               principal: newPrincipal,
+              basePrincipal: base,
               interestRate: loan.interestRate,
               startDate: rolledAt,
               dueDate: newDueDate,
@@ -79,7 +77,7 @@ async function main() {
       }
 
       console.log(`   ↻ ${rolledAt.toISOString().slice(0, 10)}: +${peso(penalty)} → ${peso(newPrincipal)} (due ${newDueDate.toISOString().slice(0, 10)})${apply ? ` [loan #${newId}]` : ''}`);
-      current = { id: newId, principal: newPrincipal, dueDate: newDueDate };
+      current = { ...current, id: newId, type: 'STANDARD', principal: newPrincipal, dueDate: newDueDate };
     }
     console.log('');
   }

@@ -1,6 +1,8 @@
 import 'dotenv/config';
 import { Role, LoanType, TransactionType } from '@prisma/client';
 import prisma from '../lib/prisma';
+import { nextDueDate } from '../lib/dueDate';
+import { monthlyInterest, interestBase } from '../lib/interest';
 
 async function main() {
   console.log('🤖 Running database script to rollover past-due loans...');
@@ -46,12 +48,10 @@ async function main() {
   console.log('\nProcessing rollovers in transaction...');
 
   for (const loan of pastDueLoans) {
-    const penalty = loan.principal * 0.05;
+    const penalty = monthlyInterest(loan);
     const newPrincipal = loan.principal + penalty;
     
-    // Set due date to 1 month from now
-    const newDueDate = new Date();
-    newDueDate.setMonth(newDueDate.getMonth() + 1);
+    const newDueDate = nextDueDate(loan.dueDate);
 
     await prisma.$transaction(async (tx) => {
       // 1. Update old loan
@@ -69,6 +69,7 @@ async function main() {
           memberId: loan.memberId,
           type: 'STANDARD' as LoanType,
           principal: newPrincipal,
+          basePrincipal: interestBase(loan),
           interestRate: loan.interestRate,
           dueDate: newDueDate,
           status: 'ACTIVE',

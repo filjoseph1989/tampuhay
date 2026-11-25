@@ -11,6 +11,7 @@ import { formatMoney } from '@/lib/currency';
 import { PiggyBank, Receipt, CreditCard, Edit2, X, Check } from 'lucide-react';
 import { useSession } from 'next-auth/react';
 import { toast } from 'sonner';
+import { monthlyInterest } from '@/lib/interest';
 
 export default function MemberDetailPage() {
   const { id } = useParams();
@@ -44,7 +45,7 @@ export default function MemberDetailPage() {
   const totalLoanBalance = useMemo(() => {
     return activeLoansList.reduce((sum, l) => {
       const effectiveRate = (member?.role === 'KABERK' || member?.role === 'TREASURER') ? l.interestRate : 10;
-      const interest = l.principal * (effectiveRate / 100);
+      const interest = monthlyInterest(l, effectiveRate);
       const totalOwed = l.principal + interest;
       return sum + (totalOwed - l.amountPaid);
     }, 0);
@@ -161,7 +162,7 @@ export default function MemberDetailPage() {
           <div className="space-y-3">
             {allMemberLoans.map((loan) => {
               const effectiveRate = (member?.role === 'KABERK' || member?.role === 'TREASURER') ? loan.interestRate : 10;
-              const interest = loan.principal * (effectiveRate / 100);
+              const interest = monthlyInterest(loan, effectiveRate);
               const totalOwed = loan.principal + interest;
               const balance = totalOwed - loan.amountPaid;
               const percentPaid = Math.round((loan.amountPaid / totalOwed) * 100);

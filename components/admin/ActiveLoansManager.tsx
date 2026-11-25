@@ -9,6 +9,7 @@ import { formatMoney } from '@/lib/currency';
 import { getMemberName } from '@/lib/utils';
 import { AlertCircle } from 'lucide-react';
 import { toast } from 'sonner';
+import { monthlyInterest } from '@/lib/interest';
 
 export default function ActiveLoansManager() {
   const { activeLoans, members, repayLoan } = useGroupStore();
@@ -31,7 +32,7 @@ export default function ActiveLoansManager() {
     const effectiveRate = (role === 'KABERK' || role === 'TREASURER')
       ? loan.interestRate
       : 10; // Todo: kaning 10 diri dapat dili ni hardcoded
-    const interest = loan.principal * (effectiveRate / 100);
+    const interest = monthlyInterest(loan, effectiveRate);
     const totalOwed = loan.principal + interest;
     const balance = totalOwed - loan.amountPaid;
 
@@ -63,7 +64,7 @@ export default function ActiveLoansManager() {
         const role = member?.role || 'MEMBER';
 
         const effectiveRate = (role === 'KABERK' || role === 'TREASURER') ? loan.interestRate : 10;
-        const interest = loan.principal * (effectiveRate / 100);
+        const interest = monthlyInterest(loan, effectiveRate);
         const totalOwed = loan.principal + interest;
         const balance = totalOwed - loan.amountPaid;
 

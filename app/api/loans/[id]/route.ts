@@ -4,6 +4,7 @@ import { calculateLoan } from '@/lib/loanCalculator';
 import { TransactionType } from '@prisma/client';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
+import { monthlyInterest } from '@/lib/interest';
 
 export async function PATCH(
   request: Request,
@@ -73,7 +74,7 @@ export async function PATCH(
       
       // Recalculate total owed based on role
       const effectiveRate = (loan.member.role === 'KABERK' || loan.member.role === 'TREASURER') ? loan.interestRate : 10;
-      const interest = loan.principal * (effectiveRate / 100);
+      const interest = monthlyInterest(loan, effectiveRate);
       const totalOwed = loan.principal + interest;
       
       const isFullyPaid = newAmountPaid >= totalOwed;

@@ -3,6 +3,7 @@ import { Button } from '../ui/Button';
 import { useGroupStore } from '../../store/useGroupStore';
 import { formatMoney } from '../../lib/currency';
 import { useState } from 'react';
+import { endOfMonthPH } from '@/lib/dueDate';
 
 interface LoanApplicationFormProps {
   borrowerName: string;
@@ -31,8 +32,7 @@ export default function LoanApplicationForm({
   const requestLoan = useGroupStore((state) => state.requestLoan);
   const member = members.find((m) => m.name.toLowerCase() === borrowerName.toLowerCase())
 
-  const dueDate = new Date();
-  dueDate.setDate(dueDate.getDate() + 30);
+  const dueDate = endOfMonthPH(); // Due at the end of this month
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();

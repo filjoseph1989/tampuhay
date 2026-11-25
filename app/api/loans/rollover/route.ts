@@ -3,6 +3,8 @@ import prisma from '@/lib/prisma';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { TransactionType, LoanType } from '@prisma/client';
+import { nextDueDate } from '@/lib/dueDate';
+import { monthlyInterest, interestBase } from '@/lib/interest';
 
 export async function POST(request: Request) {
   const session = await getServerSession(authOptions);
@@ -32,10 +34,9 @@ export async function POST(request: Request) {
 
       if (!oldLoan) throw new Error('Loan not found');
 
-      const penalty = oldLoan.principal * 0.05;
+      const penalty = monthlyInterest(oldLoan);
       const newPrincipal = oldLoan.principal + penalty;
-      const newDueDate = new Date();
-      newDueDate.setMonth(newDueDate.getMonth() + 1);
+      const newDueDate = nextDueDate(oldLoan.dueDate);
 
       // 2. Mark old loan as PAID
       await tx.loan.update({
@@ -49,6 +50,7 @@ export async function POST(request: Request) {
           memberId: oldLoan.memberId,
           type: 'STANDARD' as LoanType,
           principal: newPrincipal,
+          basePrincipal: interestBase(oldLoan),
           interestRate: oldLoan.interestRate,
           dueDate: newDueDate,
           status: 'ACTIVE',

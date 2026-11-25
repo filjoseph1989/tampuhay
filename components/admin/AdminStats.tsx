@@ -2,6 +2,7 @@ import { useMemo } from 'react';
 import { useGroupStore } from '../../store/useGroupStore';
 import { Card } from '../ui/Card';
 import { formatMoney } from '../../lib/currency';
+import { monthlyInterest } from '../../lib/interest';
 
 export default function AdminStats() {
   const { groupState, activeLoans, transactions, members } = useGroupStore();
@@ -10,7 +11,7 @@ export default function AdminStats() {
     // 1. Outstanding Loans
     const activeLoansList = activeLoans.filter(l => l.status === 'ACTIVE');
     const outstanding = activeLoansList.reduce((sum, l) => {
-      const interest = l.principal * (l.interestRate / 100);
+      const interest = monthlyInterest(l);
       return sum + (l.principal + interest - l.amountPaid);
     }, 0);
     const activeCount = activeLoansList.length;
