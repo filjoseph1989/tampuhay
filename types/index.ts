@@ -29,6 +29,7 @@ export interface Loan {
     memberId: number;
     type: 'STANDARD' | 'AUTO_CONTRIBUTION';
     principal: number;
+    basePrincipal?: number | null;
     interestRate: number;
     startDate: string;
     dueDate: string;

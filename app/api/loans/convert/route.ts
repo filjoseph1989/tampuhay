@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
+import { endOfMonthPH } from '@/lib/dueDate';
 import { TransactionType, LoanType } from '@prisma/client';
 
 export async function POST(request: Request) {
@@ -24,8 +25,7 @@ export async function POST(request: Request) {
     });
     const cycleId = activeCycle?.id || 1;
 
-    const dueDate = new Date();
-    dueDate.setMonth(dueDate.getMonth() + 1); // Due in 1 month
+    const dueDate = endOfMonthPH(); // Due at the end of this month
 
     const result = await prisma.$transaction(async (tx) => {
       // 1. Create Auto-Loan

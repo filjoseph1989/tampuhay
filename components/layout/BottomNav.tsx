@@ -31,7 +31,7 @@ export function BottomNav() {
         </Link>
 
         {canViewReports && (
-          <Link href="/report" className={`flex flex-col items-center justify-center w-full h-full space-y-1 ${isActive('/report')}`}>
+          <Link href="/breakdown" className={`flex flex-col items-center justify-center w-full h-full space-y-1 ${isActive('/breakdown')}`}>
             <PieChart size={24} />
             <span className="text-[10px] font-medium uppercase">Report</span>
           </Link>

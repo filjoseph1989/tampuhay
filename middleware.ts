@@ -11,7 +11,7 @@ export default withAuth(
     }
 
     if (
-      req.nextUrl.pathname.startsWith("/report") &&
+      req.nextUrl.pathname.startsWith("/breakdown") &&
       req.nextauth.token?.role !== "TREASURER" &&
       req.nextauth.token?.role !== "KABERK"
     ) {
@@ -25,4 +25,4 @@ export default withAuth(
   }
 );
 
-export const config = { matcher: ["/admin/:path*", "/ledger/:path*", "/members/:path*", "/report/:path*"] };
+export const config = { matcher: ["/admin/:path*", "/ledger/:path*", "/members/:path*", "/breakdown/:path*"] };

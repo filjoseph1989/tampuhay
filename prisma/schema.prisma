@@ -137,6 +137,7 @@ model Loan {
   memberId     Int
   type         LoanType   @default(STANDARD)
   principal    Float
+  basePrincipal Float? // original amount; simple interest is charged on this. null = principal
   interestRate Float
   startDate    DateTime   @default(now())
   dueDate      DateTime
